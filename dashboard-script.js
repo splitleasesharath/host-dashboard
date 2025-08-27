@@ -25,8 +25,10 @@ function initializeVoiceInput() {
     if (voiceBtn) {
         voiceBtn.addEventListener('click', () => {
             voiceOverlay.classList.add('active');
-            aiState.textContent = 'Listening...';
-            aiState.style.color = '#321662';
+            if (aiState) {
+                aiState.textContent = 'Listening...';
+                aiState.style.color = '#321662';
+            }
             
             // Simulate voice recognition
             simulateVoiceRecognition(transcript);
@@ -36,8 +38,10 @@ function initializeVoiceInput() {
     if (stopVoiceBtn) {
         stopVoiceBtn.addEventListener('click', () => {
             voiceOverlay.classList.remove('active');
-            aiState.textContent = 'Ready to help';
-            aiState.style.color = '';
+            if (aiState) {
+                aiState.textContent = 'Ready to help';
+                aiState.style.color = '';
+            }
             
             // Process the "recorded" text
             processVoiceInput(transcript.textContent);
@@ -327,11 +331,17 @@ function showLeases() {
 // Show manual creator
 function showManualCreator() {
     const aiState = document.getElementById('aiState');
-    aiState.textContent = 'Preparing manual creator...';
-    setTimeout(() => {
-        aiState.textContent = 'Ready to create manual';
+    if (aiState) {
+        aiState.textContent = 'Preparing manual creator...';
+        setTimeout(() => {
+            if (aiState) {
+                aiState.textContent = 'Ready to create manual';
+            }
+            showNotification('Manual creator opened. Start by describing your property.');
+        }, 1000);
+    } else {
         showNotification('Manual creator opened. Start by describing your property.');
-    }, 1000);
+    }
 }
 
 // Handle guest card actions
@@ -420,6 +430,8 @@ function initializeFilters() {
 // Simulate AI activity
 function simulateAIActivity() {
     const aiState = document.getElementById('aiState');
+    if (!aiState) return; // Exit if aiState element doesn't exist
+    
     const states = [
         'Ready to help',
         'Processing updates...',
@@ -431,8 +443,10 @@ function simulateAIActivity() {
     
     let stateIndex = 0;
     setInterval(() => {
-        aiState.textContent = states[stateIndex];
-        stateIndex = (stateIndex + 1) % states.length;
+        if (aiState) { // Double check before setting textContent
+            aiState.textContent = states[stateIndex];
+            stateIndex = (stateIndex + 1) % states.length;
+        }
     }, 5000);
 }
 
@@ -639,7 +653,10 @@ function handleResponsiveFeatures() {
         voiceOverlay.addEventListener('click', function(e) {
             if (e.target === this) {
                 this.classList.remove('active');
-                document.getElementById('aiState').textContent = 'Ready to help';
+                const aiState = document.getElementById('aiState');
+                if (aiState) {
+                    aiState.textContent = 'Ready to help';
+                }
             }
         });
     }
@@ -812,9 +829,14 @@ function initializeSidebarNavigation() {
                     listingsSection = document.createElement('div');
                     listingsSection.className = 'listings-section';
                     const mainContent = document.querySelector('.dashboard-main');
-                    const aiBar = document.querySelector('.ai-assistant-bar');
-                    if (mainContent && aiBar) {
-                        mainContent.insertBefore(listingsSection, aiBar.nextSibling);
+                    if (mainContent) {
+                        // Insert after back button or at the beginning of main content
+                        const backBtn = document.getElementById('back-button-container');
+                        if (backBtn && backBtn.nextSibling) {
+                            mainContent.insertBefore(listingsSection, backBtn.nextSibling);
+                        } else {
+                            mainContent.appendChild(listingsSection);
+                        }
                     }
                 }
                 
@@ -1382,55 +1404,80 @@ function initializeGuestTabs() {
 // Load full listings content
 function loadListingsContent() {
     const listingsSection = document.querySelector('.listings-section');
-    if (!listingsSection) return;
-    
-    // First, load the listings styles if not already loaded
-    if (!document.querySelector('link[href="listings-styles.css"]')) {
-        const listingsStyles = document.createElement('link');
-        listingsStyles.rel = 'stylesheet';
-        listingsStyles.href = 'listings-styles.css';
-        document.head.appendChild(listingsStyles);
+    if (!listingsSection) {
+        console.error('Listings section not found');
+        return;
     }
     
-    // Load the content script
-    if (!document.querySelector('script[src="listings-content.js"]')) {
-        const contentScript = document.createElement('script');
-        contentScript.src = 'listings-content.js';
-        contentScript.onload = function() {
-            // Once loaded, get the content and display it
-            if (typeof getListingsHTMLContent === 'function') {
-                listingsSection.innerHTML = getListingsHTMLContent();
-                
-                // Then initialize the listings functionality
-                if (!document.querySelector('script[src="listings-script.js"]')) {
-                    const listingsScript = document.createElement('script');
-                    listingsScript.src = 'listings-script.js';
-                    listingsScript.onload = function() {
-                        // Re-initialize tabs and other features after loading
-                        if (typeof initializeTabs === 'function') {
-                            initializeTabs();
-                        }
-                        if (typeof initializeAISuggestions === 'function') {
-                            initializeAISuggestions();
-                        }
-                    };
-                    document.body.appendChild(listingsScript);
-                }
-            }
-        };
-        document.body.appendChild(contentScript);
+    console.log('Loading listings content...');
+    
+    // Check if the function exists and use it
+    if (typeof getListingsHTMLContent === 'function') {
+        console.log('getListingsHTMLContent function found, loading content...');
+        const content = getListingsHTMLContent();
+        listingsSection.innerHTML = content;
+        console.log('Content loaded, length:', content.length);
     } else {
-        // If already loaded, just call the function
-        if (typeof getListingsHTMLContent === 'function') {
-            listingsSection.innerHTML = getListingsHTMLContent();
-            // Re-initialize functionality
-            if (typeof initializeTabs === 'function') {
-                initializeTabs();
-            }
-            if (typeof initializeAISuggestions === 'function') {
-                initializeAISuggestions();
-            }
+        console.error('getListingsHTMLContent function not found');
+        // Try to load the script if not loaded
+        if (!document.querySelector('script[src="listings-content.js"]')) {
+            console.log('Loading listings-content.js...');
+            const script = document.createElement('script');
+            script.src = 'listings-content.js';
+            script.onload = function() {
+                console.log('Script loaded, retrying...');
+                if (typeof getListingsHTMLContent === 'function') {
+                    const content = getListingsHTMLContent();
+                    listingsSection.innerHTML = content;
+                    initializeListingsFunctionality();
+                }
+            };
+            document.body.appendChild(script);
+            return;
         }
+    }
+    
+    // Initialize functionality after a short delay
+    setTimeout(() => {
+        initializeListingsFunctionality();
+    }, 100);
+}
+
+function initializeListingsFunctionality() {
+    console.log('Initializing listings functionality...');
+    
+    // Initialize tabs
+    const tabBtns = document.querySelectorAll('.listings-section .tab-btn');
+    const tabPanes = document.querySelectorAll('.listings-section .tab-pane');
+    
+    console.log('Found tab buttons:', tabBtns.length);
+    console.log('Found tab panes:', tabPanes.length);
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            
+            // Remove active from all
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabPanes.forEach(p => p.classList.remove('active'));
+            
+            // Add active to clicked
+            btn.classList.add('active');
+            const targetPane = document.getElementById(targetTab);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+        });
+    });
+    
+    // Initialize AI suggestions
+    const aiBtn = document.querySelector('.listings-section #aiSuggestBtn');
+    const panel = document.querySelector('.listings-section #aiSuggestionsPanel');
+    
+    if (aiBtn && panel) {
+        aiBtn.addEventListener('click', () => {
+            panel.classList.toggle('active');
+        });
     }
 }
 

@@ -1,14 +1,17 @@
 // Listings Page Scripts
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeTabs();
-    initializeAISuggestions();
-    initializeEditable();
-    initializeCalendar();
-    initializePhotoUpload();
-    initializeRulesManager();
-    initializeManualGeneration();
-});
+// Only initialize automatically if this is the standalone listings page
+if (window.location.pathname.includes('listings.html')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTabs();
+        initializeAISuggestions();
+        initializeEditable();
+        initializeCalendar();
+        initializePhotoUpload();
+        initializeRulesManager();
+        initializeManualGeneration();
+    });
+}
 
 // Tab Navigation
 function initializeTabs() {
