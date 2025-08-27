@@ -738,6 +738,22 @@ function handleResponsiveFeatures() {
     }
 }
 
+// Helper function to hide all sections
+function hideAllSections() {
+    const allSections = document.querySelectorAll('.quick-actions, .activity-section, .guests-section, .manuals-section, .listings-section');
+    allSections.forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Also hide back button
+    const backBtn = document.getElementById('back-button-container');
+    if (backBtn) backBtn.style.display = 'none';
+    
+    // Hide AI assistant bar
+    const aiBar = document.querySelector('.ai-assistant-bar');
+    if (aiBar) aiBar.style.display = 'none';
+}
+
 // Initialize sidebar navigation
 function initializeSidebarNavigation() {
     const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
@@ -751,11 +767,8 @@ function initializeSidebarNavigation() {
             if (href === 'guests.html' || linkText === 'Guests') {
                 e.preventDefault();
                 
-                // Hide all sections
-                const allSections = document.querySelectorAll('.quick-actions, .activity-section, .guests-section, .manuals-section');
-                allSections.forEach(section => {
-                    section.style.display = 'none';
-                });
+                // Hide all sections first
+                hideAllSections();
                 
                 // Show guests section specifically
                 const guestsSection = document.getElementById('guests-section');
@@ -763,13 +776,15 @@ function initializeSidebarNavigation() {
                     guestsSection.style.display = 'block';
                 }
                 
-                // Hide AI assistant bar
-                const aiBar = document.querySelector('.ai-assistant-bar');
-                if (aiBar) aiBar.style.display = 'none';
-                
                 // Update active state
                 sidebarLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
+                
+                // Update header
+                const propertyName = document.querySelector('.property-name');
+                if (propertyName) {
+                    propertyName.textContent = 'Lexington Avenue Residence - Guests';
+                }
                 
                 return;
             }
@@ -777,26 +792,19 @@ function initializeSidebarNavigation() {
             if (href === 'manuals.html' || linkText === 'Manuals' || linkText === 'House Manuals') {
                 e.preventDefault();
                 
-                // Trigger the same functionality as "View All Manuals" button
-                const allSections = document.querySelectorAll('.quick-actions, .activity-section, .guests-section, .manuals-section');
+                // Hide all sections first
+                hideAllSections();
+                
+                // Create or show back button
                 const backButtonContainer = document.getElementById('back-button-container') || createBackButton();
-                
-                // Hide all sections except manuals
-                allSections.forEach(section => {
-                    if (section.classList.contains('manuals-section')) {
-                        section.style.display = 'block';
-                        loadManualsContent();
-                    } else {
-                        section.style.display = 'none';
-                    }
-                });
-                
-                // Hide AI assistant bar
-                const aiBar = document.querySelector('.ai-assistant-bar');
-                if (aiBar) aiBar.style.display = 'none';
-                
-                // Show back button
                 backButtonContainer.style.display = 'block';
+                
+                // Show manuals section
+                const manualsSection = document.querySelector('.manuals-section');
+                if (manualsSection) {
+                    manualsSection.style.display = 'block';
+                    loadManualsContent();
+                }
                 
                 // Update header
                 const propertyName = document.querySelector('.property-name');
@@ -814,29 +822,31 @@ function initializeSidebarNavigation() {
             if (href === 'listings.html' || linkText === 'My Listings') {
                 e.preventDefault();
                 
-                // Trigger the same functionality for listings
-                const allSections = document.querySelectorAll('.quick-actions, .activity-section, .guests-section, .manuals-section');
+                // Hide all sections first
+                hideAllSections();
+                
+                // Create or show back button
                 const backButtonContainer = document.getElementById('back-button-container') || createBackButton();
+                backButtonContainer.style.display = 'block';
                 
-                // Hide all sections
-                allSections.forEach(section => {
-                    section.style.display = 'none';
-                });
+                // Remove existing listings section if it exists to start fresh
+                let existingListings = document.querySelector('.listings-section');
+                if (existingListings) {
+                    existingListings.remove();
+                }
                 
-                // Create or get listings section
-                let listingsSection = document.querySelector('.listings-section');
-                if (!listingsSection) {
-                    listingsSection = document.createElement('div');
-                    listingsSection.className = 'listings-section';
-                    const mainContent = document.querySelector('.dashboard-main');
-                    if (mainContent) {
-                        // Insert after back button or at the beginning of main content
-                        const backBtn = document.getElementById('back-button-container');
-                        if (backBtn && backBtn.nextSibling) {
-                            mainContent.insertBefore(listingsSection, backBtn.nextSibling);
-                        } else {
-                            mainContent.appendChild(listingsSection);
-                        }
+                // Create new listings section
+                let listingsSection = document.createElement('div');
+                listingsSection.className = 'listings-section';
+                
+                const mainContent = document.querySelector('.dashboard-main');
+                if (mainContent) {
+                    // Insert after back button or at the beginning of main content
+                    const backBtn = document.getElementById('back-button-container');
+                    if (backBtn && backBtn.nextSibling) {
+                        mainContent.insertBefore(listingsSection, backBtn.nextSibling);
+                    } else {
+                        mainContent.appendChild(listingsSection);
                     }
                 }
                 
@@ -870,12 +880,16 @@ function initializeSidebarNavigation() {
                 const allSections = document.querySelectorAll('.quick-actions, .activity-section, .guests-section, .manuals-section, .listings-section');
                 const backButtonContainer = document.getElementById('back-button-container');
                 
-                // Show original sections
+                // Show original sections with proper display types
                 allSections.forEach(section => {
-                    if (!section.classList.contains('listings-section')) {
-                        section.style.display = 'block';
-                    } else {
+                    if (section.classList.contains('listings-section')) {
                         section.style.display = 'none';
+                    } else if (section.classList.contains('guests-section') || section.id === 'guests-section') {
+                        section.style.display = 'none'; // Keep guests section hidden on dashboard
+                    } else if (section.classList.contains('quick-actions')) {
+                        section.style.display = 'grid'; // Quick actions needs grid display
+                    } else {
+                        section.style.display = 'block';
                     }
                 });
                 
