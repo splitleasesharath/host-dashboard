@@ -81,6 +81,27 @@
     gap: 24px;
 }
 
+.overview-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.overview-btn:hover {
+    background: var(--dark-purple);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(50, 22, 98, 0.2);
+}
+
 .header-btn {
     position: relative;
     background: none;

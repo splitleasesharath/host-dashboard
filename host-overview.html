@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Overview - Split.Lease</title>
+    <link rel="stylesheet" href="host-styles.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
+    <link rel="stylesheet" href="host-overview-styles.css">
+</head>
+<body class="overview-body">
+    <!-- Header -->
+    <header class="overview-header">
+        <div class="header-left">
+            <div class="property-badge">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor" opacity="0.6"/>
+                </svg>
+                <span class="property-name">Host Overview</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button class="header-btn" id="notificationBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
+                </svg>
+                <span class="notification-badge">3</span>
+            </button>
+            
+            <div class="user-menu">
+                <img src="https://ui-avatars.com/api/?name=Charlie+Host&background=321662&color=fff" alt="Host" class="user-avatar">
+                <span class="user-name">Charlie</span>
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <div class="overview-container">
+        <!-- Main Content -->
+        <main class="overview-main">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Welcome back, Charlie</h1>
+                <div class="help-banner">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#321662"/>
+                    </svg>
+                    <span>Need help setting up?</span>
+                    <a href="#" class="help-link">Ask a Specialist Co-host!</a>
+                </div>
+            </div>
+
+            <!-- Your Listings Section -->
+            <div class="listings-section">
+                <div class="section-header">
+                    <h2 class="section-title">Your Listings</h2>
+                    <div class="header-buttons">
+                        <button class="add-listing-btn">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                            </svg>
+                            <span>Create New Listing</span>
+                        </button>
+                        <button class="import-listing-btn">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z M18 7l-1.4-1.4-6.6 6.6 1.4 1.4L18 7z" fill="currentColor"/>
+                            </svg>
+                            <span>Import Listing</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="listings-grid">
+                    <!-- Listing 1 -->
+                    <div class="listing-card">
+                        <div class="listing-header">
+                            <div class="listing-status active">Active</div>
+                        </div>
+                        <div class="listing-content">
+                            <h3 class="listing-title">Modern Private Room in Clinton, 2BR 2BA, Full Kitchen, WiFi, AC</h3>
+                            <div class="listing-location">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                                </svg>
+                                <span>Manhattan</span>
+                            </div>
+                            <div class="listing-actions">
+                                <button class="action-btn create">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                                    </svg>
+                                    <span>Create House Manual</span>
+                                </button>
+                                <button class="action-btn manage" onclick="window.location.href='dashboard.html'">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/>
+                                    </svg>
+                                    <span>Manage Listing</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Listing 2 -->
+                    <div class="listing-card">
+                        <div class="listing-header">
+                            <div class="listing-status active">Active</div>
+                        </div>
+                        <div class="listing-content">
+                            <h3 class="listing-title">Cozy 2BR Retreat with Kitchenette, 2 Baths, Gym & WiFi in Milford</h3>
+                            <div class="listing-location">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                                </svg>
+                                <span>Milford</span>
+                            </div>
+                            <div class="listing-actions">
+                                <button class="action-btn edit">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                                    </svg>
+                                    <span>View / Edit House Manual</span>
+                                </button>
+                                <button class="action-btn manage" onclick="window.location.href='dashboard.html'">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/>
+                                    </svg>
+                                    <span>Manage Listing</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Listing 3 -->
+                    <div class="listing-card">
+                        <div class="listing-header">
+                            <div class="listing-status active">Active</div>
+                            <div class="listing-stats">
+                                <div class="stat-item proposals">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z" fill="currentColor"/>
+                                    </svg>
+                                    <span>Proposals</span>
+                                    <span class="stat-count">13</span>
+                                </div>
+                                <div class="stat-item leases">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2z" fill="currentColor"/>
+                                    </svg>
+                                    <span>Leases</span>
+                                    <span class="stat-count">6</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="listing-content">
+                            <h3 class="listing-title">Stunning Restored Loft with Gym, Doorman & Modern Amenities in Little Italy</h3>
+                            <div class="listing-location">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                                </svg>
+                                <span>Manhattan</span>
+                            </div>
+                            <div class="listing-actions">
+                                <button class="action-btn edit">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                                    </svg>
+                                    <span>View / Edit House Manual</span>
+                                </button>
+                                <button class="action-btn manage" onclick="window.location.href='dashboard.html'">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/>
+                                    </svg>
+                                    <span>Manage Listing</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats Section -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="#321662" opacity="0.7"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Listings</span>
+                        <span class="stat-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z" fill="#321662" opacity="0.7"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Active Proposals</span>
+                        <span class="stat-value">13</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2z" fill="#321662" opacity="0.7"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Active Leases</span>
+                        <span class="stat-value">6</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#321662" opacity="0.7"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">House Manuals</span>
+                        <span class="stat-value">2</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="host-overview.js"></script>
+</body>
+</html>
