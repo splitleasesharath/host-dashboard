@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Action buttons for each listing
-    const actionButtons = document.querySelectorAll('.action-btn');
-    actionButtons.forEach(button => {
+    const listingActionButtons = document.querySelectorAll('.listing-card .action-btn');
+    listingActionButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
             const action = this.classList[1]; // get create, edit, or manage class
@@ -50,6 +50,37 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 case 'manage':
                     console.log('Managing listing:', listingTitle);
+                    // Already has onclick in HTML to go to dashboard
+                    break;
+            }
+        });
+    });
+    
+    // Create New Manual button
+    const addManualBtn = document.querySelector('.add-manual-btn');
+    if (addManualBtn) {
+        addManualBtn.addEventListener('click', function() {
+            window.location.href = 'dashboard.html#create-manual';
+        });
+    }
+    
+    // Action buttons for each manual
+    const manualActionButtons = document.querySelectorAll('.manual-card .action-btn');
+    manualActionButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const action = this.classList[1]; // get edit or manage class
+            const manualCard = this.closest('.manual-card');
+            const manualTitle = manualCard.querySelector('.manual-title').textContent;
+            
+            switch(action) {
+                case 'edit':
+                    console.log('Editing manual:', manualTitle);
+                    // Redirect to manual editing page
+                    window.location.href = 'manuals.html#edit';
+                    break;
+                case 'manage':
+                    console.log('Managing manual:', manualTitle);
                     // Already has onclick in HTML to go to dashboard
                     break;
             }
