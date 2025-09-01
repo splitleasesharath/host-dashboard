@@ -294,12 +294,12 @@ function getListingsHTMLContent() {
                     
                     <div class="photos-grid">
                         <div class="photo-item cover">
-                            <img src="https://via.placeholder.com/300x200" alt="Cover">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%236b7280'%3ENo Image%3C/text%3E%3C/svg%3E" alt="Cover">
                             <span class="photo-badge">Cover Photo</span>
                             <button class="photo-delete">×</button>
                         </div>
                         <div class="photo-item">
-                            <img src="https://via.placeholder.com/300x200" alt="Room">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%236b7280'%3ENo Image%3C/text%3E%3C/svg%3E" alt="Room">
                             <button class="photo-delete">×</button>
                         </div>
                     </div>

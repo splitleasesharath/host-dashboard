@@ -91,11 +91,11 @@
                     </svg>
                     <span>Manuals</span>
                 </a>
-                <a href="guests.html" class="nav-item">
+                <a href="guests.html" class="nav-item" style="display: none;">
                     <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
                     </svg>
-                    <span>Guests</span>
+                    <span>Visits</span>
                 </a>
             </nav>
         </aside>
@@ -208,131 +208,11 @@
                 </div>
             </div>
 
-            <!-- Current Guests Section - Using Manual Card Structure -->
-            <div class="manuals-section" id="guests-section" style="display: none;">
-                <div class="section-header">
-                    <h2 class="section-title">Guest Management</h2>
-                    <div class="section-filters">
-                        <button class="filter-btn active">All</button>
-                        <button class="filter-btn">Current</button>
-                        <button class="filter-btn">Upcoming</button>
-                        <button class="filter-btn">Past</button>
-                    </div>
-                </div>
-                
-                <div class="manuals-grid">
-                    <div class="manual-card">
-                        <div class="manual-icon">
-                            <svg viewBox="0 0 24 24" width="40" height="40">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#321662" opacity="0.7"/>
-                            </svg>
-                        </div>
-                        <div class="manual-content">
-                            <h3 class="manual-title">Sarah Johnson</h3>
-                            <p class="manual-desc">Currently staying in 2BR Suite with checkout on Sep 2</p>
-                            <div class="manual-meta">
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" fill="currentColor"/>
-                                    </svg>
-                                    7 nights
-                                </span>
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/>
-                                    </svg>
-                                    2BR Suite
-                                </span>
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                                    </svg>
-                                    Active
-                                </span>
-                            </div>
-                        </div>
-                        <div class="manual-actions">
-                            <button class="manual-btn">Contact</button>
-                            <button class="manual-btn secondary">Manual</button>
-                            <button class="manual-btn primary">Details</button>
-                        </div>
-                    </div>
-                    
-                    <div class="manual-card">
-                        <div class="manual-icon">
-                            <svg viewBox="0 0 24 24" width="40" height="40">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#321662" opacity="0.6"/>
-                            </svg>
-                        </div>
-                        <div class="manual-content">
-                            <h3 class="manual-title">Mike Chen</h3>
-                            <p class="manual-desc">Arriving tomorrow for 3-night stay in 2BR Suite</p>
-                            <div class="manual-meta">
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" fill="currentColor"/>
-                                    </svg>
-                                    3 nights
-                                </span>
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor"/>
-                                    </svg>
-                                    Tomorrow
-                                </span>
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/>
-                                    </svg>
-                                    Confirmed
-                                </span>
-                            </div>
-                        </div>
-                        <div class="manual-actions">
-                            <button class="manual-btn">Prepare</button>
-                            <button class="manual-btn secondary">Contact</button>
-                            <button class="manual-btn primary">Details</button>
-                        </div>
-                    </div>
-                    
-                    <div class="manual-card">
-                        <div class="manual-icon">
-                            <svg viewBox="0 0 24 24" width="40" height="40">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#321662" opacity="0.5"/>
-                            </svg>
-                        </div>
-                        <div class="manual-content">
-                            <h3 class="manual-title">Emily Rodriguez</h3>
-                            <p class="manual-desc">Past guest - stayed Aug 15-20 in 2BR Suite</p>
-                            <div class="manual-meta">
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M11 17a2.5 2.5 0 002.5-2.5 2.5 2.5 0 00-2.5-2.5 2.5 2.5 0 00-2.5 2.5 2.5 2.5 0 002.5 2.5m6.5-7.5l3.23-3.23c.78-.78.78-2.05 0-2.83l-1.42-1.42c-.78-.78-2.05-.78-2.83 0L13.84 5.66c-.78.78-.78 2.05 0 2.83l1.42 1.42c.39.39.9.58 1.41.58s1.02-.19 1.41-.58M8.5 12.5l1.43 1.43-6.15 6.15H2v-1.78z" fill="currentColor"/>
-                                    </svg>
-                                    5 stars
-                                </span>
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" fill="currentColor"/>
-                                    </svg>
-                                    5 nights
-                                </span>
-                                <span class="meta-item">
-                                    <svg viewBox="0 0 24 24" width="14" height="14">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                                    </svg>
-                                    Reviewed
-                                </span>
-                            </div>
-                        </div>
-                        <div class="manual-actions">
-                            <button class="manual-btn">View Stay</button>
-                            <button class="manual-btn secondary">Message</button>
-                            <button class="manual-btn primary">Invite Back</button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Visits Section - Shows shared guests and their visit logs -->
+            <div class="guests-section" id="guests-section" style="display: none;">
+                <!-- Content will be populated by JavaScript loadGuestsContent() -->
             </div>
+
 
 
             <!-- House Manuals Section -->
@@ -759,6 +639,19 @@ Check-out:
                     
                     <input type="email" id="guest-email" placeholder="guest@email.com" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; transition: border-color 0.2s; box-sizing: border-box;">
                     <input type="tel" id="guest-phone" placeholder="+1 (555) 123-4567" style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; display: none; transition: border-color 0.2s; box-sizing: border-box;">
+                </div>
+                
+                <div class="form-group" style="display: flex; flex-direction: column;">
+                    <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Use Case *</label>
+                    <select id="guest-usecase" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; transition: border-color 0.2s; box-sizing: border-box; color: #374151;">
+                        <option value="Guest">Guest</option>
+                        <option value="Family Member">Family Member</option>
+                        <option value="Contractor">Contractor</option>
+                        <option value="Cleaner">Cleaner</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Other">Other</option>
+                    </select>
                 </div>
                 
                 <div class="form-group" style="display: flex; flex-direction: column;">

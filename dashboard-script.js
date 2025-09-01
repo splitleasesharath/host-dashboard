@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Only initialize manual cards if not HM lead
     if (!isHMLead) {
         initializeManualCards();
+        // Add a small delay to ensure DOM is ready
+        setTimeout(() => {
+            updateManualSharedInfo();
+        }, 100);
     }
     initializeSidebarNavigation();
     initializeSectionToggle();
@@ -418,6 +422,83 @@ window.skipListingCreation = function() {
     showCreatedListing();
 };
 
+// Add Proposals and Leases cards after listing creation
+function addProposalsAndLeasesCards() {
+    // Find the quick actions section
+    const quickActions = document.querySelector('.quick-actions');
+    if (!quickActions) return;
+    
+    // Check if cards already exist
+    if (document.querySelector('.proposal-card') || document.querySelector('.lease-card')) {
+        return; // Cards already added
+    }
+    
+    // Create Proposals card
+    const proposalsCard = document.createElement('div');
+    proposalsCard.className = 'action-card proposal-card';
+    proposalsCard.innerHTML = `
+        <div class="action-icon">
+            <svg viewBox="0 0 24 24" width="32" height="32">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#10b981" opacity="0.7"/>
+            </svg>
+        </div>
+        <h3 class="action-title">Proposals</h3>
+        <p class="action-desc">Review and manage tenant proposals</p>
+        <div style="margin: 15px 0;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: #10b98115; border-radius: 6px; margin-bottom: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#10b981"/>
+                </svg>
+                <span style="font-size: 13px; color: #059669;">3 new proposals received</span>
+            </div>
+            <div style="font-size: 12px; color: #6b7280; padding: 0 8px;">
+                Latest: John Smith - $2,500/mo
+            </div>
+        </div>
+        <button class="action-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">View Proposals</button>
+    `;
+    
+    // Create Leases card
+    const leasesCard = document.createElement('div');
+    leasesCard.className = 'action-card lease-card';
+    leasesCard.innerHTML = `
+        <div class="action-icon">
+            <svg viewBox="0 0 24 24" width="32" height="32">
+                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" fill="#f59e0b" opacity="0.7"/>
+            </svg>
+        </div>
+        <h3 class="action-title">Leases</h3>
+        <p class="action-desc">Manage active and pending leases</p>
+        <div style="margin: 15px 0;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: #fef3c715; border-radius: 6px; margin-bottom: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" fill="#f59e0b"/>
+                </svg>
+                <span style="font-size: 13px; color: #d97706;">1 lease pending signature</span>
+            </div>
+            <div style="font-size: 12px; color: #6b7280; padding: 0 8px;">
+                Ready for execution
+            </div>
+        </div>
+        <button class="action-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">Manage Leases</button>
+    `;
+    
+    // Add the cards to quick actions
+    quickActions.appendChild(proposalsCard);
+    quickActions.appendChild(leasesCard);
+    
+    // Add click handlers
+    proposalsCard.querySelector('.action-btn').addEventListener('click', function() {
+        showNotification('Opening proposals dashboard...');
+        // Could navigate to proposals section or open modal
+    });
+    
+    leasesCard.querySelector('.action-btn').addEventListener('click', function() {
+        showNotification('Opening leases management...');
+        // Could navigate to leases section or open modal
+    });
+}
+
 function showCreatedListing() {
     // Close modal
     closeListingModal();
@@ -425,6 +506,9 @@ function showCreatedListing() {
     // Store that we created a listing
     localStorage.setItem('hmLeadListingCreated', 'true');
     console.log('Listing created and saved to localStorage');
+    
+    // Add Proposals and Leases cards to the dashboard
+    addProposalsAndLeasesCards();
     
     // Check if we're already on the listings page
     const listingsSection = document.querySelector('.listings-section');
@@ -456,6 +540,14 @@ function initializeHMLeadFlow() {
     if (window.hmLeadManualCreated || localStorage.getItem('hmLeadManualCreated') === 'true') {
         // Show the created state instead of empty state
         returnToDashboardWithNewManual();
+        
+        // Also check if listing was created and add the cards
+        if (localStorage.getItem('hmLeadListingCreated') === 'true') {
+            setTimeout(() => {
+                addProposalsAndLeasesCards();
+            }, 200);
+        }
+        
         return;
     }
     
@@ -946,12 +1038,8 @@ function initializeManualCards() {
             } else if (action === 'preview') {
                 window.open('../index.html', '_blank');
             } else if (action === 'share') {
-                showNotification(`Sharing link generated for: ${manualTitle}`);
-                // Animate button
-                this.textContent = 'Copied!';
-                setTimeout(() => {
-                    this.textContent = 'Share';
-                }, 1500);
+                // Open share modal with the manual name
+                openShareModal(manualTitle);
             }
         });
     });
@@ -1311,32 +1399,14 @@ function initializeSidebarNavigation() {
             const href = this.getAttribute('href');
             const linkText = this.querySelector('span').textContent;
             
-            // Handle Guests and Manuals links specially
-            if (href === 'guests.html' || linkText === 'Guests') {
+            // Handle Visits link (currently hidden)
+            if (href === 'guests.html' || linkText === 'Visits') {
+                // Visits section is currently hidden - do nothing
                 e.preventDefault();
-                
-                // Hide all sections first
-                hideAllSections();
-                
-                // Show guests section specifically
-                const guestsSection = document.getElementById('guests-section');
-                if (guestsSection) {
-                    guestsSection.style.display = 'block';
-                }
-                
-                // Update active state
-                sidebarLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Update header
-                const propertyName = document.querySelector('.property-name');
-                if (propertyName) {
-                    propertyName.textContent = 'Lexington Avenue Residence - Guests';
-                }
-                
                 return;
             }
             
+            // Handle Manuals link
             if (href === 'manuals.html' || linkText === 'Manuals' || linkText === 'House Manuals') {
                 e.preventDefault();
                 
@@ -1490,7 +1560,7 @@ function initializeSidebarNavigation() {
                 // Reload if we're not on the original content
                 const guestsSection = document.querySelector('.guests-section');
                 const listingsSection = document.querySelector('.listings-section');
-                if ((guestsSection && guestsSection.innerHTML.includes('Guest Management')) ||
+                if ((guestsSection && guestsSection.innerHTML.includes('Visit Tracking')) ||
                     (listingsSection && listingsSection.innerHTML.includes('Property Listings'))) {
                     location.reload();
                 }
@@ -1623,7 +1693,7 @@ function initializeSectionToggle() {
         }
     }
     
-    // Handle View All Guests click
+    // Handle View All Visits click
     if (viewGuestsBtn) {
         viewGuestsBtn.addEventListener('click', function() {
             // Hide all sections except guests
@@ -1647,7 +1717,7 @@ function initializeSectionToggle() {
             // Update header
             const propertyName = document.querySelector('.property-name');
             if (propertyName) {
-                propertyName.textContent = 'Lexington Avenue Residence - Guests';
+                propertyName.textContent = 'Lexington Avenue Residence - Visits';
             }
         });
     }
@@ -1715,148 +1785,233 @@ function initializeSectionToggle() {
     }
 }
 
-// Load full guests content
+// Load full guests content - Now shows shared guests with visit logs
 function loadGuestsContent() {
     const guestsSection = document.querySelector('.guests-section');
     if (!guestsSection) return;
     
-    // Update the section with full guests interface
+    // Get shared guests from localStorage
+    const sharedGuests = JSON.parse(localStorage.getItem('sharedGuests') || '[]');
+    
+    // Generate visit logs for shared guests
+    const generateVisitLogs = (guest) => {
+        const logs = [];
+        const today = new Date();
+        
+        // Add some sample visit logs
+        if (guest.sharedAt) {
+            const sharedDate = new Date(guest.sharedAt);
+            logs.push({
+                date: sharedDate.toLocaleDateString(),
+                time: sharedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                action: 'Manual shared',
+                manual: guest.manualName || 'House Manual'
+            });
+            
+            // Add random view logs
+            const viewCount = Math.floor(Math.random() * 5) + 1;
+            for(let i = 0; i < viewCount; i++) {
+                const viewDate = new Date(sharedDate);
+                viewDate.setHours(viewDate.getHours() + Math.random() * 72);
+                logs.push({
+                    date: viewDate.toLocaleDateString(),
+                    time: viewDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    action: 'Viewed manual',
+                    manual: guest.manualName || 'House Manual'
+                });
+            }
+        }
+        
+        return logs.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+    };
+    
+    // Generate guest cards HTML
+    const guestCardsHTML = sharedGuests.map(guest => {
+        const logs = generateVisitLogs(guest);
+        const lastVisit = logs[0];
+        const viewCount = logs.filter(log => log.action === 'Viewed manual').length;
+        
+        // Determine use case color
+        const useCaseColors = {
+            'Family Member': '#10b981',
+            'Contractor': '#f59e0b',
+            'Cleaner': '#3b82f6',
+            'Guest': '#8b5cf6',
+            'Maintenance': '#ef4444',
+            'Friend': '#ec4899',
+            'Other': '#6b7280'
+        };
+        
+        const useCase = guest.useCase || 'Guest';
+        const useCaseColor = useCaseColors[useCase] || useCaseColors['Other'];
+        
+        return `
+            <div class="guest-card" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; background: white;">
+                <div class="guest-header" style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <div class="guest-icon">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(guest.name)}&background=321662&color=fff" 
+                             alt="${guest.name}" style="width: 48px; height: 48px; border-radius: 50%;">
+                    </div>
+                    <div class="guest-info" style="flex: 1;">
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;">${guest.name}</h3>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+                            <span style="display: inline-block; padding: 2px 8px; background: ${useCaseColor}20; color: ${useCaseColor}; 
+                                       border-radius: 4px; font-size: 12px; font-weight: 500;">${useCase}</span>
+                            <span style="color: #6b7280; font-size: 12px;">${guest.email || guest.phone || 'No contact'}</span>
+                        </div>
+                    </div>
+                    <div class="visit-stats" style="text-align: right;">
+                        <div style="font-size: 20px; font-weight: 600; color: #321662;">${viewCount}</div>
+                        <div style="font-size: 12px; color: #6b7280;">Total Visits</div>
+                    </div>
+                </div>
+                
+                <div class="visit-logs" style="border-top: 1px solid #e5e7eb; padding-top: 15px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 500; color: #6b7280;">Recent Activity</h4>
+                    <div class="logs-list" style="space-y: 8px;">
+                        ${logs.slice(0, 3).map(log => `
+                            <div class="log-item" style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f9fafb; border-radius: 6px; margin-bottom: 6px;">
+                                <svg viewBox="0 0 24 24" width="16" height="16" style="flex-shrink: 0;">
+                                    ${log.action === 'Manual shared' ? 
+                                        '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="#10b981"/>' :
+                                        '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#6b7280"/>'}
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #374151;">${log.action}</div>
+                                    <div style="font-size: 11px; color: #9ca3af;">${log.date} at ${log.time}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${logs.length > 3 ? `
+                        <button class="view-all-logs" style="margin-top: 10px; width: 100%; padding: 8px; background: white; border: 1px solid #e5e7eb; 
+                                border-radius: 6px; font-size: 12px; color: #6b7280; cursor: pointer; transition: all 0.2s;"
+                                onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                            View all ${logs.length} activities
+                        </button>
+                    ` : ''}
+                </div>
+                
+                <div class="guest-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button style="flex: 1; padding: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                            color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer;">
+                        View Manual Access
+                    </button>
+                    <button style="flex: 1; padding: 8px; background: white; color: #6b7280; border: 1px solid #e5e7eb; 
+                            border-radius: 6px; font-size: 13px; cursor: pointer;">
+                        Revoke Access
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Update the section with visits interface
     guestsSection.innerHTML = `
         <div class="section-header">
-            <h2 class="section-title">Guest Management</h2>
+            <h2 class="section-title">Visit Tracking & Access Management</h2>
             <div class="tabs-nav-wrapper">
                 <div class="tabs-nav">
-                    <button class="tab-btn active" data-tab="overview">Overview</button>
-                    <button class="tab-btn" data-tab="current">Current Guests</button>
-                    <button class="tab-btn" data-tab="upcoming">Upcoming</button>
-                    <button class="tab-btn" data-tab="past">Past Guests</button>
-                    <button class="tab-btn" data-tab="messages">Messages</button>
-                    <button class="tab-btn" data-tab="reviews">Reviews</button>
+                    <button class="tab-btn active" data-tab="all">All Visitors</button>
+                    <button class="tab-btn" data-tab="family">Family</button>
+                    <button class="tab-btn" data-tab="contractors">Contractors</button>
+                    <button class="tab-btn" data-tab="cleaners">Cleaners</button>
+                    <button class="tab-btn" data-tab="maintenance">Maintenance</button>
                 </div>
-                <button class="btn-primary add-guest">
+                <button class="btn-primary share-manual" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                     <svg viewBox="0 0 24 24" width="16" height="16">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="white"/>
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="white"/>
                     </svg>
-                    Add Guest
+                    Share Manual
                 </button>
             </div>
         </div>
         
-        <div class="tab-content active" id="overview-tab">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">
+        <div class="tab-content active" id="visits-overview">
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="stat-card" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div class="stat-icon" style="margin-bottom: 10px;">
                         <svg viewBox="0 0 24 24" width="24" height="24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#321662"/>
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#321662"/>
                         </svg>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">2</div>
-                        <div class="stat-label">Current Guests</div>
+                        <div class="stat-value" style="font-size: 24px; font-weight: 600; color: #1f2937;">${sharedGuests.length}</div>
+                        <div class="stat-label" style="font-size: 12px; color: #6b7280;">Total Shared Access</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
+                <div class="stat-card" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div class="stat-icon" style="margin-bottom: 10px;">
                         <svg viewBox="0 0 24 24" width="24" height="24">
-                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" fill="#D4A574"/>
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#10b981"/>
                         </svg>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">5</div>
-                        <div class="stat-label">Upcoming Arrivals</div>
+                        <div class="stat-value" style="font-size: 24px; font-weight: 600; color: #1f2937;">
+                            ${sharedGuests.reduce((total, guest) => {
+                                const logs = generateVisitLogs(guest);
+                                return total + logs.filter(log => log.action === 'Viewed manual').length;
+                            }, 0)}
+                        </div>
+                        <div class="stat-label" style="font-size: 12px; color: #6b7280;">Total Visits Today</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
+                <div class="stat-card" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div class="stat-icon" style="margin-bottom: 10px;">
                         <svg viewBox="0 0 24 24" width="24" height="24">
-                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" fill="#6B46C1"/>
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="#f59e0b"/>
                         </svg>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">12</div>
-                        <div class="stat-label">Messages</div>
+                        <div class="stat-value" style="font-size: 24px; font-weight: 600; color: #1f2937;">
+                            ${sharedGuests.length > 0 ? 'Active' : 'No Activity'}
+                        </div>
+                        <div class="stat-label" style="font-size: 12px; color: #6b7280;">Current Status</div>
                     </div>
                 </div>
             </div>
             
-            <div class="guests-grid">
-                <div class="guest-card">
-                    <div class="guest-icon">
-                        <img src="https://ui-avatars.com/api/?name=Sarah+Johnson&background=321662&color=fff" alt="Guest">
-                    </div>
-                    <div class="guest-content">
-                        <h3 class="guest-title">Sarah Johnson</h3>
-                        <p class="guest-desc">2BR Suite • Currently Staying</p>
-                        <div class="guest-meta">
-                            <span class="meta-item">Aug 26 - Sep 2</span>
-                            <span class="meta-item">7 nights</span>
-                        </div>
-                    </div>
-                    <div class="guest-actions">
-                        <button class="guest-btn primary">View</button>
-                        <button class="guest-btn">Contact</button>
-                    </div>
-                </div>
-                
-                <div class="guest-card">
-                    <div class="guest-icon">
-                        <img src="https://ui-avatars.com/api/?name=Mike+Chen&background=D4A574&color=fff" alt="Guest">
-                    </div>
-                    <div class="guest-content">
-                        <h3 class="guest-title">Mike Chen</h3>
-                        <p class="guest-desc">2BR Suite • Arriving Tomorrow</p>
-                        <div class="guest-meta">
-                            <span class="meta-item">Aug 27 - 30</span>
-                            <span class="meta-item">3 nights</span>
-                        </div>
-                    </div>
-                    <div class="guest-actions">
-                        <button class="guest-btn primary">Prepare</button>
-                        <button class="guest-btn">Manual</button>
-                    </div>
-                </div>
-                
-                <div class="guest-card">
-                    <div class="guest-icon">
-                        <img src="https://ui-avatars.com/api/?name=Emily+Davis&background=6B46C1&color=fff" alt="Guest">
-                    </div>
-                    <div class="guest-content">
-                        <h3 class="guest-title">Emily Davis</h3>
-                        <p class="guest-desc">Master Suite • Upcoming</p>
-                        <div class="guest-meta">
-                            <span class="meta-item">Sep 5 - 12</span>
-                            <span class="meta-item">7 nights</span>
-                        </div>
-                    </div>
-                    <div class="guest-actions">
-                        <button class="guest-btn primary">View</button>
-                        <button class="guest-btn">Contact</button>
-                    </div>
-                </div>
-                
-                <div class="guest-card">
-                    <div class="guest-icon">
-                        <img src="https://ui-avatars.com/api/?name=Robert+Lee&background=D4A574&color=fff" alt="Guest">
-                    </div>
-                    <div class="guest-content">
-                        <h3 class="guest-title">Robert Lee</h3>
-                        <p class="guest-desc">1BR Suite • Past Guest</p>
-                        <div class="guest-meta">
-                            <span class="meta-item">Aug 15 - 22</span>
-                            <span class="meta-item">Checked out</span>
-                        </div>
-                    </div>
-                    <div class="guest-actions">
-                        <button class="guest-btn primary">Review</button>
-                        <button class="guest-btn">Invoice</button>
-                    </div>
-                </div>
+            <div class="guests-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+                ${guestCardsHTML || '<p style="text-align: center; color: #6b7280; padding: 40px;">No visitors have been granted access yet. Share a manual to get started.</p>'}
             </div>
         </div>
     `;
     
-    // Initialize tabs for guests
+    // Initialize tabs for visits
     initializeGuestTabs();
+    
+    // Add share manual button handler
+    const shareBtn = guestsSection.querySelector('.share-manual');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', function() {
+            const shareModal = document.getElementById('share-modal');
+            if (shareModal) {
+                shareModal.style.display = 'flex';
+                
+                // Add use case dropdown if not exists
+                const modalForm = shareModal.querySelector('.modal-form');
+                if (modalForm && !modalForm.querySelector('#guest-usecase')) {
+                    const phoneGroup = modalForm.querySelector('.form-group:last-child');
+                    const useCaseGroup = document.createElement('div');
+                    useCaseGroup.className = 'form-group';
+                    useCaseGroup.innerHTML = `
+                        <label>Use Case</label>
+                        <select id="guest-usecase" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px;">
+                            <option value="Guest">Guest</option>
+                            <option value="Family Member">Family Member</option>
+                            <option value="Contractor">Contractor</option>
+                            <option value="Cleaner">Cleaner</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Friend">Friend</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    `;
+                    modalForm.insertBefore(useCaseGroup, phoneGroup.nextSibling);
+                }
+            }
+        });
+    }
 }
 
 // Return to dashboard with new manual after creation
@@ -2048,8 +2203,11 @@ function returnToDashboardWithNewManual() {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const actionText = btn.textContent.trim();
+                const manualCard = btn.closest('.manual-card');
+                const manualTitle = manualCard ? manualCard.querySelector('.manual-title')?.textContent.trim() : 'Guest House Manual';
+                
                 if (actionText === 'Share') {
-                    openShareModal();
+                    openShareModal(manualTitle);
                 } else if (actionText === 'Edit') {
                     console.log('Edit manual clicked');
                     window.open('https://splitleasesharath.github.io/guest-house-manual/', '_blank');
@@ -2076,6 +2234,11 @@ function returnToDashboardWithNewManual() {
             }
         });
     }, 100);
+    
+    // Update shared info on manual cards
+    setTimeout(() => {
+        updateManualSharedInfo();
+    }, 150);
     
     // Store that manual was created
     window.hmLeadManualCreated = true;
@@ -3220,10 +3383,81 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeListingModal();
 });
 
+// Update manual cards to show who they're shared with
+function updateManualSharedInfo() {
+    const sharedGuests = JSON.parse(localStorage.getItem('sharedGuests') || '[]');
+    console.log('Updating manual shared info. Shared guests:', sharedGuests);
+    
+    // Group guests by manual
+    const manualShares = {};
+    sharedGuests.forEach(guest => {
+        const manualName = guest.manualName || 'Standard Guest Manual';
+        if (!manualShares[manualName]) {
+            manualShares[manualName] = [];
+        }
+        manualShares[manualName].push(guest.name);
+    });
+    console.log('Manual shares grouped:', manualShares);
+    
+    // Update each manual card
+    document.querySelectorAll('.manual-card').forEach(card => {
+        const titleElement = card.querySelector('.manual-title');
+        if (titleElement) {
+            const manualTitle = titleElement.textContent.trim();
+            const sharedWith = manualShares[manualTitle] || [];
+            console.log(`Manual "${manualTitle}" shared with:`, sharedWith);
+            
+            // Remove existing shared info if any
+            const existingSharedInfo = card.querySelector('.shared-info');
+            if (existingSharedInfo) {
+                existingSharedInfo.remove();
+            }
+            
+            // Add shared info if there are shares
+            if (sharedWith.length > 0) {
+                const sharedInfo = document.createElement('div');
+                sharedInfo.className = 'shared-info';
+                sharedInfo.style.cssText = `
+                    margin-top: 8px;
+                    padding: 6px 10px;
+                    background: linear-gradient(135deg, #667eea15, #764ba215);
+                    border-radius: 6px;
+                    font-size: 12px;
+                    color: #6b46c1;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                `;
+                
+                const sharedText = sharedWith.length === 1 
+                    ? `Shared with ${sharedWith[0]}`
+                    : `Shared with ${sharedWith[0]} and ${sharedWith.length - 1} other${sharedWith.length - 1 > 1 ? 's' : ''}`;
+                
+                sharedInfo.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="14" height="14">
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="currentColor"/>
+                    </svg>
+                    ${sharedText}
+                `;
+                
+                // Insert after the description
+                const descElement = card.querySelector('.manual-desc');
+                if (descElement) {
+                    descElement.parentNode.insertBefore(sharedInfo, descElement.nextSibling);
+                }
+            }
+        }
+    });
+}
+
 // Share Modal Functions
-function openShareModal() {
+function openShareModal(manualName = null) {
     const modal = document.getElementById('share-modal');
     if (modal) {
+        // Store the manual being shared
+        window.currentManualToShare = manualName;
+        console.log('Opening share modal for manual:', manualName);
+        
         modal.classList.add('show');
         document.getElementById('share-form').style.display = 'flex';
         document.getElementById('share-success').style.display = 'none';
@@ -3240,6 +3474,8 @@ function closeShareModal() {
         document.getElementById('guest-email').required = true;
         document.getElementById('guest-phone').style.display = 'none';
         document.getElementById('guest-phone').required = false;
+        // Clear the manual being shared
+        window.currentManualToShare = null;
     }
 }
 
@@ -3319,14 +3555,25 @@ function initializeShareModal() {
             const message = document.getElementById('personal-message').value;
             
             // Create guest object
+            const useCaseSelect = document.getElementById('guest-usecase');
+            const useCase = useCaseSelect ? useCaseSelect.value : 'Guest';
+            
+            // Get the manual that's being shared (for now we'll use a default)
+            const manualName = window.currentManualToShare || 'Standard Guest Manual';
+            console.log('Saving guest share for manual:', manualName);
+            
             const guest = {
                 name: guestName,
                 contactMethod: contactMethod,
                 contact: contact,
+                email: contactMethod === 'email' ? contact : null,
+                phone: contactMethod === 'phone' ? contact : null,
                 checkinDate: checkinDate,
                 message: message,
+                useCase: useCase,
                 sharedAt: new Date().toISOString(),
-                manualViewed: false
+                manualViewed: false,
+                manualName: manualName
             };
             
             // Add to shared guests list
@@ -3340,6 +3587,9 @@ function initializeShareModal() {
             
             // Update guests section if visible
             updateGuestsSection();
+            
+            // Update manual cards to show shared info
+            updateManualSharedInfo();
             
             // Close modal after 2 seconds
             setTimeout(() => {
