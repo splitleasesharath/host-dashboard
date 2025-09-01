@@ -3,6 +3,7 @@
 // Function to reset HM lead state for testing
 window.resetHMLeadState = function() {
     localStorage.removeItem('hmLeadManualCreated');
+    localStorage.removeItem('hmLeadListingCreated');
     localStorage.removeItem('sharedGuests');
     window.hmLeadManualCreated = false;
     console.log('HM Lead state reset. Refresh the page to see empty state.');
@@ -346,16 +347,108 @@ function showBlurredListingWithCTA(container) {
 
 // Listing creation functions
 window.createListingFromManual = function() {
-    alert('This would convert your house manual into a Split.Lease listing automatically!');
+    // Open listing modal
+    const modal = document.getElementById('listing-modal');
+    if (modal) {
+        modal.classList.add('show');
+        showListingStep(1);
+        // Pre-fill some data from manual
+        document.getElementById('listing-title').value = 'Lexington Avenue Residence';
+        document.getElementById('property-type').value = 'apartment';
+    }
 };
 
 window.createListingFromScratch = function() {
-    alert('This would start the listing creation wizard from scratch.');
+    // Open listing modal
+    const modal = document.getElementById('listing-modal');
+    if (modal) {
+        modal.classList.add('show');
+        showListingStep(1);
+    }
 };
 
 window.importFromOtherSite = function() {
     alert('This would import your existing Airbnb/VRBO listing.');
 };
+
+// Listing modal functions
+window.showListingStep = function(step) {
+    document.querySelectorAll('#listing-modal .modal-step').forEach(s => {
+        s.classList.remove('active');
+    });
+    document.getElementById(`listing-step-${step}`).classList.add('active');
+};
+
+window.closeListingModal = function() {
+    const modal = document.getElementById('listing-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        // Reset form
+        document.getElementById('listing-basic-form').reset();
+        document.getElementById('photo-preview').innerHTML = '';
+        document.getElementById('count-text').textContent = '0 of 4 photos uploaded';
+    }
+};
+
+let uploadedPhotos = [];
+let listingCountdownInterval;
+
+window.createListing = function() {
+    showListingStep(3);
+    
+    // Start countdown
+    let seconds = 30;
+    const countdownEl = document.getElementById('listing-countdown');
+    
+    listingCountdownInterval = setInterval(() => {
+        seconds--;
+        if (countdownEl) countdownEl.textContent = seconds;
+        
+        if (seconds <= 0) {
+            clearInterval(listingCountdownInterval);
+            showCreatedListing();
+        }
+    }, 1000);
+};
+
+window.skipListingCreation = function() {
+    if (listingCountdownInterval) {
+        clearInterval(listingCountdownInterval);
+    }
+    showCreatedListing();
+};
+
+function showCreatedListing() {
+    // Close modal
+    closeListingModal();
+    
+    // Store that we created a listing
+    localStorage.setItem('hmLeadListingCreated', 'true');
+    console.log('Listing created and saved to localStorage');
+    
+    // Check if we're already on the listings page
+    const listingsSection = document.querySelector('.listings-section');
+    if (listingsSection && listingsSection.style.display === 'block') {
+        // We're already on listings page, just reload the content
+        console.log('Refreshing listings content...');
+        loadListingsContent();
+    } else {
+        // Navigate to listings page with the new listing
+        const listingsLink = document.querySelector('.sidebar-link[href="listings.html"]');
+        if (listingsLink) {
+            console.log('Navigating to listings page...');
+            // Simulate click and ensure content loads
+            listingsLink.click();
+            // Force reload of content after navigation
+            setTimeout(() => {
+                const listingsSection = document.querySelector('.listings-section');
+                if (listingsSection) {
+                    loadListingsContent();
+                }
+            }, 100);
+        }
+    }
+}
 
 // Initialize House Manual Lead Flow
 function initializeHMLeadFlow() {
@@ -391,7 +484,7 @@ function initializeHMLeadFlow() {
                 </svg>
                 <h2 style="color: #321662; margin-bottom: 10px;">Welcome to Your Host Dashboard</h2>
                 <p style="color: #6b7280; margin-bottom: 30px;">Let's start by creating your first house manual</p>
-                <button class="action-btn creation" onclick="document.getElementById('creation-modal').classList.add('show'); window.showStep(1);">
+                <button class="action-btn creation" onclick="document.getElementById('creation-modal').classList.add('show'); window.showStep(1);" style="margin: 0 auto; display: block;">
                     Create Your First House Manual
                 </button>
             </div>
@@ -1318,9 +1411,19 @@ function initializeSidebarNavigation() {
                 
                 listingsSection.style.display = 'block';
                 
-                // If HM lead, show blurred listing with CTA
+                // If HM lead, check if they've created a listing
                 if (isHMLead) {
-                    showBlurredListingWithCTA(listingsSection);
+                    const listingCreated = localStorage.getItem('hmLeadListingCreated') === 'true';
+                    console.log('HM Lead viewing listings. Listing created:', listingCreated);
+                    if (listingCreated) {
+                        // Show the actual listing they can edit
+                        console.log('Showing editable listing for HM lead');
+                        loadListingsContent();
+                    } else {
+                        // Show blurred listing with CTA
+                        console.log('Showing Split.Lease CTA for HM lead');
+                        showBlurredListingWithCTA(listingsSection);
+                    }
                 } else {
                     loadListingsContent();
                 }
@@ -1880,19 +1983,27 @@ function returnToDashboardWithNewManual() {
                             </span>
                         </div>
                     </div>
-                    <div class="manual-actions">
-                        <button class="manual-action">
-                            <svg viewBox="0 0 24 24" width="16" height="16">
-                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                    <div class="manual-actions" style="display: flex; flex-direction: column; gap: 10px; padding: 0 20px 20px;">
+                        <button class="manual-preview" style="width: 100%; padding: 10px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 6px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <svg viewBox="0 0 24 24" width="18" height="18">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="white"/>
                             </svg>
-                            Edit
+                            Preview Manual
                         </button>
-                        <button class="manual-action">
-                            <svg viewBox="0 0 24 24" width="16" height="16">
-                                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="currentColor"/>
-                            </svg>
-                            Share
-                        </button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="manual-action" style="flex: 1; padding: 8px 12px; background: white; border: 1px solid #e5e7eb; border-radius: 6px; color: #374151; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                                </svg>
+                                Edit
+                            </button>
+                            <button class="manual-action" style="flex: 1; padding: 8px 12px; background: #321662; border: none; border-radius: 6px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="currentColor"/>
+                                </svg>
+                                Share
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1913,6 +2024,25 @@ function returnToDashboardWithNewManual() {
             });
         });
         
+        // Handle preview button
+        const previewBtn = document.querySelector('.manual-preview');
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.open('https://splitleasesharath.github.io/guest-house-manual/', '_blank');
+            });
+            
+            // Add hover effect for preview button
+            previewBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+            });
+            previewBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            });
+        }
+        
         // Also reinitialize action buttons
         document.querySelectorAll('.manual-action').forEach(btn => {
             btn.addEventListener('click', function(e) {
@@ -1922,9 +2052,28 @@ function returnToDashboardWithNewManual() {
                     openShareModal();
                 } else if (actionText === 'Edit') {
                     console.log('Edit manual clicked');
-                    // Could open edit modal or redirect to edit page
+                    window.open('https://splitleasesharath.github.io/guest-house-manual/', '_blank');
                 }
             });
+            
+            // Add hover effects
+            if (btn.style.background === 'white') {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.background = '#f9fafb';
+                    this.style.borderColor = '#9ca3af';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.background = 'white';
+                    this.style.borderColor = '#e5e7eb';
+                });
+            } else {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.background = '#1e0f3d';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.background = '#321662';
+                });
+            }
         });
     }, 100);
     
@@ -3066,6 +3215,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize share modal functionality
     initializeShareModal();
+    
+    // Initialize listing modal functionality
+    initializeListingModal();
 });
 
 // Share Modal Functions
@@ -3092,6 +3244,44 @@ function closeShareModal() {
 }
 
 function initializeShareModal() {
+    // Add focus styles to inputs
+    const inputs = document.querySelectorAll('#share-modal input[type="text"], #share-modal input[type="email"], #share-modal input[type="tel"], #share-modal input[type="date"], #share-modal textarea');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.borderColor = '#321662';
+            this.style.outline = 'none';
+            this.style.boxShadow = '0 0 0 3px rgba(50, 22, 98, 0.1)';
+        });
+        input.addEventListener('blur', function() {
+            this.style.borderColor = '#d1d5db';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Add hover effects to buttons
+    const cancelBtn = document.querySelector('#share-modal .btn-secondary');
+    const sendBtn = document.querySelector('#share-modal button[type="submit"]');
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('mouseenter', function() {
+            this.style.background = '#f9fafb';
+            this.style.borderColor = '#9ca3af';
+        });
+        cancelBtn.addEventListener('mouseleave', function() {
+            this.style.background = 'white';
+            this.style.borderColor = '#d1d5db';
+        });
+    }
+    
+    if (sendBtn) {
+        sendBtn.addEventListener('mouseenter', function() {
+            this.style.background = '#1e0f3d';
+        });
+        sendBtn.addEventListener('mouseleave', function() {
+            this.style.background = '#321662';
+        });
+    }
+    
     // Handle contact method toggle
     const contactRadios = document.querySelectorAll('input[name="contact-method"]');
     const emailInput = document.getElementById('guest-email');
@@ -3231,4 +3421,66 @@ function updateGuestsSection() {
 window.addEventListener('DOMContentLoaded', function() {
     updateGuestsSection();
 });
+
+// Initialize listing modal
+function initializeListingModal() {
+    // Handle form submission
+    const listingForm = document.getElementById('listing-basic-form');
+    if (listingForm) {
+        listingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showListingStep(2);
+            
+            // For testing - enable create button without photos
+            const createBtn = document.getElementById('create-listing-btn');
+            if (createBtn) {
+                createBtn.disabled = false;
+                createBtn.textContent = 'Create Listing (Skip Photos for Testing)';
+            }
+        });
+    }
+    
+    // Handle photo upload (optional for testing)
+    const photoInput = document.getElementById('photo-files');
+    if (photoInput) {
+        photoInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            uploadedPhotos = files.slice(0, 4); // Max 4 photos
+            
+            // Update preview
+            const preview = document.getElementById('photo-preview');
+            preview.innerHTML = '';
+            
+            uploadedPhotos.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 8px;';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <button type="button" onclick="removePhoto(${index})" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">×</button>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // Update count
+            document.getElementById('count-text').textContent = `${uploadedPhotos.length} of 4 photos uploaded`;
+            
+            // Enable create button if 4+ photos
+            if (uploadedPhotos.length >= 4) {
+                document.getElementById('create-listing-btn').disabled = false;
+            }
+        });
+    }
+}
+
+window.removePhoto = function(index) {
+    uploadedPhotos.splice(index, 1);
+    // Re-trigger change event to update preview
+    const photoInput = document.getElementById('photo-files');
+    const event = new Event('change');
+    photoInput.dispatchEvent(event);
+};
 

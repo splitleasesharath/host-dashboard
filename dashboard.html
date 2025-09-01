@@ -623,51 +623,158 @@ Check-out:
         </div>
     </div>
 
-    <!-- Share Manual Modal -->
-    <div id="share-modal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <span class="modal-close" onclick="closeShareModal()">&times;</span>
+    <!-- Listing Creation Modal -->
+    <div id="listing-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="modal-close" onclick="closeListingModal()">&times;</span>
             
-            <h2 style="color: #321662; margin-bottom: 10px;">Share House Manual</h2>
-            <p style="color: #6b7280; margin-bottom: 30px;">Enter guest details to share your house manual</p>
+            <!-- Step 1: Basic Info -->
+            <div id="listing-step-1" class="modal-step active">
+                <h2 style="color: #321662; margin-bottom: 10px;">Create Your Split.Lease Listing</h2>
+                <p style="color: #6b7280; margin-bottom: 30px;">Let's start with basic information about your space</p>
+                
+                <form id="listing-basic-form" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="form-group">
+                        <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Listing Title *</label>
+                        <input type="text" id="listing-title" placeholder="e.g., Cozy Studio in Manhattan" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Property Type *</label>
+                        <select id="property-type" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px;">
+                            <option value="">Select property type</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="house">House</option>
+                            <option value="condo">Condo</option>
+                            <option value="studio">Studio</option>
+                            <option value="loft">Loft</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Bedrooms *</label>
+                            <input type="number" id="bedrooms" min="0" max="10" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px;">
+                        </div>
+                        <div class="form-group">
+                            <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Bathrooms *</label>
+                            <input type="number" id="bathrooms" min="0" max="10" step="0.5" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Monthly Rate *</label>
+                        <input type="number" id="monthly-rate" placeholder="$2500" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Available Days per Week *</label>
+                        <select id="available-days" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px;">
+                            <option value="">Select availability</option>
+                            <option value="2-3">2-3 days per week</option>
+                            <option value="3-4">3-4 days per week</option>
+                            <option value="4-5">4-5 days per week</option>
+                            <option value="weekends">Weekends only</option>
+                            <option value="weekdays">Weekdays only</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn-secondary" onclick="closeListingModal()" style="padding: 10px 24px;">Cancel</button>
+                        <button type="submit" class="action-btn" style="padding: 10px 24px; background: #321662;">Next: Add Photos</button>
+                    </div>
+                </form>
+            </div>
             
-            <form id="share-form" style="display: flex; flex-direction: column; gap: 20px;">
-                <div class="form-group">
-                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Guest Name *</label>
-                    <input type="text" id="guest-name" placeholder="John Smith" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+            <!-- Step 2: Upload Photos -->
+            <div id="listing-step-2" class="modal-step">
+                <h2 style="color: #321662; margin-bottom: 10px;">Add Photos</h2>
+                <p style="color: #6b7280; margin-bottom: 30px;">Upload at least 4 photos of your space</p>
+                
+                <div id="photo-upload-area" style="border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px; text-align: center; background: #f9fafb;">
+                    <svg viewBox="0 0 24 24" width="48" height="48" style="fill: #9ca3af; margin: 0 auto 15px;">
+                        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                    </svg>
+                    <p style="color: #6b7280; margin-bottom: 15px;">Drag & drop photos here or click to browse</p>
+                    <input type="file" id="photo-files" multiple accept="image/*" style="display: none;">
+                    <button type="button" class="action-btn" onclick="document.getElementById('photo-files').click()" style="padding: 8px 20px;">Choose Files</button>
                 </div>
                 
-                <div class="form-group">
-                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Contact Method *</label>
-                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="radio" name="contact-method" value="email" checked style="margin-right: 8px;">
+                <div id="photo-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin-top: 20px;"></div>
+                
+                <div id="photo-count" style="margin-top: 20px; color: #6b7280; font-size: 14px;">
+                    <span id="count-text">0 of 4 photos uploaded</span>
+                </div>
+                
+                <div style="display: flex; gap: 12px; justify-content: space-between; margin-top: 30px;">
+                    <button type="button" class="btn-secondary" onclick="showListingStep(1)" style="padding: 10px 24px;">Back</button>
+                    <button type="button" id="create-listing-btn" class="action-btn" onclick="createListing()" style="padding: 10px 24px; background: #321662;" disabled>Create Listing</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Creating Listing -->
+            <div id="listing-step-3" class="modal-step">
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div class="loading-spinner" style="margin: 0 auto 30px;">
+                        <svg class="spinner" viewBox="0 0 50 50" width="50" height="50">
+                            <circle class="path" cx="25" cy="25" r="20" fill="none" stroke="#321662" stroke-width="5"></circle>
+                        </svg>
+                    </div>
+                    <h2 style="color: #321662;">Creating Your Listing</h2>
+                    <p class="loading-text" style="color: #6b7280; margin-top: 15px;">Processing photos and generating listing... (<span id="listing-countdown">30</span>s remaining)</p>
+                    <div style="margin-top: 30px;">
+                        <button class="btn-secondary" onclick="skipListingCreation()" style="padding: 10px 24px;">Skip (View Now)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Manual Modal -->
+    <div id="share-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; padding: 40px;">
+            <span class="modal-close" onclick="closeShareModal()">&times;</span>
+            
+            <h2 style="color: #321662; margin-bottom: 10px; font-size: 24px; font-weight: 600;">Share House Manual</h2>
+            <p style="color: #6b7280; margin-bottom: 30px; font-size: 14px;">Enter guest details to share your house manual</p>
+            
+            <form id="share-form" style="display: flex; flex-direction: column; gap: 24px;">
+                <div class="form-group" style="display: flex; flex-direction: column;">
+                    <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Guest Name *</label>
+                    <input type="text" id="guest-name" placeholder="John Smith" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; transition: border-color 0.2s; box-sizing: border-box;">
+                </div>
+                
+                <div class="form-group" style="display: flex; flex-direction: column;">
+                    <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Contact Method *</label>
+                    <div style="display: flex; gap: 20px; margin-bottom: 12px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; color: #4b5563; font-size: 14px;">
+                            <input type="radio" name="contact-method" value="email" checked style="margin-right: 8px; cursor: pointer;">
                             <span>Email</span>
                         </label>
-                        <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="radio" name="contact-method" value="phone" style="margin-right: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; color: #4b5563; font-size: 14px;">
+                            <input type="radio" name="contact-method" value="phone" style="margin-right: 8px; cursor: pointer;">
                             <span>Phone (SMS)</span>
                         </label>
                     </div>
                     
-                    <input type="email" id="guest-email" placeholder="guest@email.com" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
-                    <input type="tel" id="guest-phone" placeholder="+1 (555) 123-4567" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px; display: none;">
+                    <input type="email" id="guest-email" placeholder="guest@email.com" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; transition: border-color 0.2s; box-sizing: border-box;">
+                    <input type="tel" id="guest-phone" placeholder="+1 (555) 123-4567" style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; display: none; transition: border-color 0.2s; box-sizing: border-box;">
                 </div>
                 
-                <div class="form-group">
-                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Check-in Date (Optional)</label>
-                    <input type="date" id="checkin-date" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+                <div class="form-group" style="display: flex; flex-direction: column;">
+                    <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Check-in Date (Optional)</label>
+                    <input type="date" id="checkin-date" style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; transition: border-color 0.2s; box-sizing: border-box; color: #374151;">
                 </div>
                 
-                <div class="form-group">
-                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Personal Message (Optional)</label>
-                    <textarea id="personal-message" placeholder="Welcome to our home! Looking forward to hosting you..." style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px; min-height: 80px; resize: vertical;"></textarea>
+                <div class="form-group" style="display: flex; flex-direction: column;">
+                    <label style="display: block; color: #374151; font-size: 14px; margin-bottom: 8px; font-weight: 500;">Personal Message (Optional)</label>
+                    <textarea id="personal-message" placeholder="Welcome to our home! Looking forward to hosting you..." style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; min-height: 100px; resize: vertical; transition: border-color 0.2s; box-sizing: border-box; font-family: inherit; line-height: 1.5;"></textarea>
                 </div>
                 
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
-                    <button type="button" class="btn-secondary" onclick="closeShareModal()" style="padding: 10px 24px;">Cancel</button>
-                    <button type="submit" class="action-btn" style="padding: 10px 24px; background: #321662;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 8px;">
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <button type="button" class="btn-secondary" onclick="closeShareModal()" style="padding: 10px 24px; background: white; border: 1px solid #d1d5db; color: #374151; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">Cancel</button>
+                    <button type="submit" class="action-btn" style="padding: 10px 24px; background: #321662; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" width="16" height="16">
                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
                         </svg>
                         Send Manual
