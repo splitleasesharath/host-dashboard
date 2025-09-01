@@ -1,18 +1,473 @@
 // Dashboard Scripts - Host Portal
 
+// Function to reset HM lead state for testing
+window.resetHMLeadState = function() {
+    localStorage.removeItem('hmLeadManualCreated');
+    localStorage.removeItem('sharedGuests');
+    window.hmLeadManualCreated = false;
+    console.log('HM Lead state reset. Refresh the page to see empty state.');
+};
+
+// Initialize shared guests list
+window.sharedGuests = JSON.parse(localStorage.getItem('sharedGuests') || '[]');
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is a house manual lead
+    const urlParams = new URLSearchParams(window.location.search);
+    const isHMLead = urlParams.get('hm_lead') === 'true';
+    
+    if (isHMLead) {
+        // Initialize empty dashboard for first-time user
+        initializeHMLeadFlow();
+        // Don't initialize normal quick actions for HM lead
+    } else {
+        initializeQuickActions();
+    }
+    
     initializeVoiceInput();
     initializeMockNotifications();
-    initializeQuickActions();
     initializeFilters();
     simulateAIActivity();
     initializeMobileMenu();
     handleResponsiveFeatures();
     initializeGuestCards();
-    initializeManualCards();
+    // Only initialize manual cards if not HM lead
+    if (!isHMLead) {
+        initializeManualCards();
+    }
     initializeSidebarNavigation();
     initializeSectionToggle();
 });
+
+// Show blurred listing with Split Lease CTA
+function showBlurredListingWithCTA(container) {
+    container.innerHTML = `
+        <style>
+            .blurred-listing-container {
+                position: relative;
+                min-height: 600px;
+                width: 100%;
+                overflow: hidden;
+            }
+            
+            .blurred-content {
+                filter: blur(8px);
+                opacity: 0.6;
+                pointer-events: none;
+                user-select: none;
+                width: 100%;
+            }
+            
+            .split-lease-overlay {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                max-width: 700px;
+                width: calc(100% - 40px);
+                max-width: min(700px, calc(100vw - 100px));
+                text-align: center;
+                z-index: 1000;
+                max-height: 85vh;
+                overflow-y: auto;
+            }
+            
+            @media (max-width: 1200px) {
+                .split-lease-overlay {
+                    max-width: 600px;
+                    padding: 25px;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .split-lease-overlay {
+                    padding: 20px;
+                    width: calc(100% - 30px);
+                    max-width: calc(100vw - 30px);
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    max-height: 90vh;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .split-lease-overlay {
+                    padding: 20px 15px;
+                    border-radius: 15px;
+                }
+            }
+            
+            .sl-logo {
+                width: 60px;
+                height: 60px;
+                margin: 0 auto 20px;
+            }
+            
+            .sl-title {
+                font-size: 28px;
+                color: #321662;
+                margin-bottom: 15px;
+                font-weight: 600;
+            }
+            
+            @media (max-width: 768px) {
+                .sl-title {
+                    font-size: 24px;
+                }
+            }
+            
+            .sl-subtitle {
+                color: #6b7280;
+                margin-bottom: 30px;
+                line-height: 1.6;
+            }
+            
+            @media (max-width: 768px) {
+                .sl-subtitle {
+                    font-size: 14px;
+                    margin-bottom: 20px;
+                }
+            }
+            
+            .sl-features {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin: 25px 0;
+                text-align: left;
+            }
+            
+            @media (max-width: 768px) {
+                .sl-features {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    margin: 20px 0;
+                }
+            }
+            
+            .sl-feature {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .sl-feature-icon {
+                color: #10b981;
+                flex-shrink: 0;
+                margin-top: 2px;
+                font-size: 16px;
+            }
+            
+            .sl-feature-text {
+                color: #4b5563;
+                font-size: 13px;
+                line-height: 1.4;
+                text-align: left;
+            }
+            
+            .sl-feature-text strong {
+                display: block;
+                color: #374151;
+                font-size: 14px;
+                margin-bottom: 2px;
+            }
+            
+            .sl-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 30px;
+            }
+            
+            @media (min-width: 768px) {
+                .sl-buttons {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 15px;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .sl-buttons {
+                    flex-direction: column;
+                }
+            }
+            
+            .sl-btn {
+                padding: 14px 20px;
+                border-radius: 10px;
+                font-size: 15px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s;
+                border: none;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                white-space: nowrap;
+                min-width: 0;
+            }
+            
+            @media (max-width: 768px) {
+                .sl-btn {
+                    width: 100%;
+                    padding: 12px 16px;
+                    font-size: 14px;
+                }
+                
+                .sl-btn svg {
+                    width: 18px;
+                    height: 18px;
+                }
+            }
+            
+            .sl-btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+            
+            .sl-btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            }
+            
+            .sl-btn-secondary {
+                background: #f3f4f6;
+                color: #374151;
+                border: 2px solid #e5e7eb;
+            }
+            
+            .sl-btn-secondary:hover {
+                background: #e5e7eb;
+            }
+            
+            .sl-btn-outline {
+                background: white;
+                color: #6b7280;
+                border: 2px solid #e5e7eb;
+            }
+            
+            .sl-btn-outline:hover {
+                border-color: #9ca3af;
+            }
+        </style>
+        
+        <div class="blurred-listing-container">
+            <!-- Blurred background content -->
+            <div class="blurred-content">
+                <div style="padding: 20px;">
+                    <h2 style="font-size: 24px; margin-bottom: 20px;">My Listings</h2>
+                    <div style="background: #f5f5f5; height: 200px; border-radius: 12px; margin-bottom: 20px;"></div>
+                    <div style="background: #f5f5f5; height: 150px; border-radius: 12px; margin-bottom: 20px;"></div>
+                    <div style="background: #f5f5f5; height: 180px; border-radius: 12px;"></div>
+                </div>
+            </div>
+            
+            <!-- Split Lease CTA Overlay -->
+            <div class="split-lease-overlay">
+                <div class="sl-logo">
+                    <svg viewBox="0 0 60 60" style="width: 100%; height: 100%;">
+                        <circle cx="30" cy="30" r="25" stroke="#321662" stroke-width="2" fill="none" opacity="0.3"/>
+                        <path d="M30 15L20 22.5v15h6V30h8v7.5h6v-15L30 15z" fill="#321662" opacity="0.9"/>
+                        <path d="M23 30h14v7.5h-14z" fill="#764ba2" opacity="0.6"/>
+                    </svg>
+                </div>
+                
+                <h2 class="sl-title">Welcome to Split.Lease</h2>
+                <p class="sl-subtitle">
+                    Turn your house manual into a revenue-generating listing on our platform for multilocal professionals
+                </p>
+                
+                <div class="sl-features">
+                    <div class="sl-feature">
+                        <span class="sl-feature-icon">✓</span>
+                        <span class="sl-feature-text">
+                            <strong>Multilocal Tenants</strong><br>
+                            Tech & finance professionals who need NYC accommodation 2-4 days/week
+                        </span>
+                    </div>
+                    <div class="sl-feature">
+                        <span class="sl-feature-icon">✓</span>
+                        <span class="sl-feature-text">
+                            <strong>Higher Revenue</strong><br>
+                            Earn more by renting to two complementary schedules (Mon-Wed + Thu-Sun)
+                        </span>
+                    </div>
+                    <div class="sl-feature">
+                        <span class="sl-feature-icon">✓</span>
+                        <span class="sl-feature-text">
+                            <strong>Verified Professionals</strong><br>
+                            All tenants are background-checked working professionals
+                        </span>
+                    </div>
+                    <div class="sl-feature">
+                        <span class="sl-feature-icon">✓</span>
+                        <span class="sl-feature-text">
+                            <strong>Guaranteed Payment</strong><br>
+                            Get paid even if one time slot is empty
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="sl-buttons">
+                    <button class="sl-btn sl-btn-primary" onclick="createListingFromManual()">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/>
+                        </svg>
+                        <span>Create from Manual</span>
+                    </button>
+                    <button class="sl-btn sl-btn-secondary" onclick="createListingFromScratch()">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                        </svg>
+                        <span>Start Fresh</span>
+                    </button>
+                    <button class="sl-btn sl-btn-outline" onclick="importFromOtherSite()">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+                        </svg>
+                        <span>Import</span>
+                    </button>
+                </div>
+                
+                <p style="margin-top: 20px; font-size: 13px; color: #9ca3af;">
+                    Join 40+ NYC hosts earning an extra $1,200-2,500/month
+                </p>
+            </div>
+        </div>
+    `;
+}
+
+// Listing creation functions
+window.createListingFromManual = function() {
+    alert('This would convert your house manual into a Split.Lease listing automatically!');
+};
+
+window.createListingFromScratch = function() {
+    alert('This would start the listing creation wizard from scratch.');
+};
+
+window.importFromOtherSite = function() {
+    alert('This would import your existing Airbnb/VRBO listing.');
+};
+
+// Initialize House Manual Lead Flow
+function initializeHMLeadFlow() {
+    // Check if manual was already created in this session
+    if (window.hmLeadManualCreated || localStorage.getItem('hmLeadManualCreated') === 'true') {
+        // Show the created state instead of empty state
+        returnToDashboardWithNewManual();
+        return;
+    }
+    
+    // Hide ALL existing content for empty dashboard feel
+    const activitySection = document.querySelector('.activity-section');
+    const quickActions = document.querySelector('.quick-actions');
+    const manualsSection = document.querySelector('.manuals-section');
+    
+    // Hide activity section completely - it should be empty for new users
+    if (activitySection) {
+        activitySection.style.display = 'none';
+        activitySection.style.visibility = 'hidden';
+        // Also clear any existing activity items
+        const activityList = activitySection.querySelector('.activity-list');
+        if (activityList) {
+            activityList.innerHTML = '';
+        }
+    }
+    
+    // Completely replace quick actions with single "Create Manual" button
+    if (quickActions) {
+        quickActions.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <svg viewBox="0 0 24 24" width="80" height="80" style="fill: #321662; margin-bottom: 20px; opacity: 0.2;">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+                <h2 style="color: #321662; margin-bottom: 10px;">Welcome to Your Host Dashboard</h2>
+                <p style="color: #6b7280; margin-bottom: 30px;">Let's start by creating your first house manual</p>
+                <button class="action-btn creation" onclick="document.getElementById('creation-modal').classList.add('show'); window.showStep(1);">
+                    Create Your First House Manual
+                </button>
+            </div>
+        `;
+    }
+    
+    // Hide the ENTIRE manuals section from dashboard for HM leads
+    if (manualsSection) {
+        // Remove the entire section completely
+        manualsSection.style.display = 'none';
+        manualsSection.remove();
+    }
+    
+    // Also check for the ID-based selector
+    const manualsSectionById = document.getElementById('manuals-section');
+    if (manualsSectionById) {
+        manualsSectionById.style.display = 'none';
+        manualsSectionById.remove();
+    }
+    
+    // Double-check after page loads
+    setTimeout(() => {
+        // Remove by class
+        const allManualsSections = document.querySelectorAll('.manuals-section');
+        allManualsSections.forEach(section => {
+            section.remove();
+        });
+        
+        // Remove by ID
+        const manualById = document.getElementById('manuals-section');
+        if (manualById) {
+            manualById.remove();
+        }
+    }, 10);
+    
+    // Auto-open the creation modal after a short delay
+    setTimeout(() => {
+        const modal = document.getElementById('creation-modal');
+        if (modal) {
+            // Use the existing modal show functionality
+            modal.classList.add('show');
+            
+            // Use existing showStep function if available
+            if (typeof window.showStep === 'function') {
+                window.showStep(1);
+            } else {
+                // Fallback to showing first step
+                const firstStep = document.getElementById('step-1');
+                if (firstStep) {
+                    document.querySelectorAll('.modal-step').forEach(step => {
+                        step.classList.remove('active');
+                    });
+                    firstStep.classList.add('active');
+                }
+            }
+        }
+    }, 1500);
+    
+    // Update the header to show it's a new account
+    const propertyName = document.querySelector('.property-name');
+    if (propertyName) {
+        propertyName.textContent = 'Getting Started';
+    }
+    
+    // Update user name for demo
+    const userName = document.querySelector('.user-name');
+    if (userName) {
+        userName.textContent = 'New Host';
+    }
+    
+    // Hide notification badge
+    const notificationBadge = document.querySelector('.notification-badge');
+    if (notificationBadge) {
+        notificationBadge.style.display = 'none';
+    }
+}
 
 // Voice Input Functionality
 function initializeVoiceInput() {
@@ -803,7 +1258,14 @@ function initializeSidebarNavigation() {
                 const manualsSection = document.querySelector('.manuals-section');
                 if (manualsSection) {
                     manualsSection.style.display = 'block';
-                    loadManualsContent();
+                    // Check if HM lead to show empty state
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isHMLead = urlParams.get('hm_lead') === 'true';
+                    if (isHMLead) {
+                        loadEmptyManualsState();
+                    } else {
+                        loadManualsContent();
+                    }
                 }
                 
                 // Update header
@@ -819,8 +1281,12 @@ function initializeSidebarNavigation() {
                 return;
             }
             
-            if (href === 'listings.html' || linkText === 'My Listings') {
+            if (href === 'listings.html' || linkText === 'My Listings' || linkText === 'My Listing') {
                 e.preventDefault();
+                
+                // Check if user is HM lead
+                const urlParams = new URLSearchParams(window.location.search);
+                const isHMLead = urlParams.get('hm_lead') === 'true';
                 
                 // Hide all sections first
                 hideAllSections();
@@ -851,7 +1317,13 @@ function initializeSidebarNavigation() {
                 }
                 
                 listingsSection.style.display = 'block';
-                loadListingsContent();
+                
+                // If HM lead, show blurred listing with CTA
+                if (isHMLead) {
+                    showBlurredListingWithCTA(listingsSection);
+                } else {
+                    loadListingsContent();
+                }
                 
                 // Hide AI assistant bar
                 const aiBar = document.querySelector('.ai-assistant-bar');
@@ -1084,8 +1556,14 @@ function initializeSectionToggle() {
             allSections.forEach(section => {
                 if (section.classList.contains('manuals-section')) {
                     section.style.display = 'block';
-                    // Load manuals content
-                    loadManualsContent();
+                    // Check if HM lead to show empty state
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isHMLead = urlParams.get('hm_lead') === 'true';
+                    if (isHMLead) {
+                        loadEmptyManualsState();
+                    } else {
+                        loadManualsContent();
+                    }
                 } else {
                     section.style.display = 'none';
                 }
@@ -1276,6 +1754,291 @@ function loadGuestsContent() {
     
     // Initialize tabs for guests
     initializeGuestTabs();
+}
+
+// Return to dashboard with new manual after creation
+function returnToDashboardWithNewManual() {
+    const mainContent = document.querySelector('.dashboard-main');
+    if (!mainContent) return;
+    
+    // First, restore the quick actions with only Create New Manual card
+    const quickActions = document.querySelector('.quick-actions');
+    if (quickActions) {
+        quickActions.innerHTML = `
+            <div class="action-card">
+                <div class="action-icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#321662" opacity="0.7"/>
+                    </svg>
+                </div>
+                <h3 class="action-title">Create New Manual</h3>
+                <p class="action-desc">Start fresh or import existing</p>
+                <button class="action-btn creation">Begin Creation</button>
+            </div>
+        `;
+    }
+    
+    // Find or create activity section
+    let activitySection = document.querySelector('.activity-section');
+    if (!activitySection) {
+        // Create new activity section since it was removed
+        activitySection = document.createElement('div');
+        activitySection.className = 'activity-section';
+        
+        // Find where to insert it (after quick actions)
+        if (quickActions && quickActions.nextSibling) {
+            mainContent.insertBefore(activitySection, quickActions.nextSibling);
+        } else {
+            mainContent.appendChild(activitySection);
+        }
+    }
+    
+    // Show and update activity section with new content
+    activitySection.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
+    activitySection.innerHTML = `
+            <div class="section-header">
+                <h2 class="section-title">Recent Activity</h2>
+                <button class="section-action">View All</button>
+            </div>
+            
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: #10b981;">
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">House Manual Created</div>
+                        <div class="activity-desc">"Guest House Manual" has been successfully created</div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                    <button class="activity-action">View</button>
+                </div>
+            </div>
+        `;
+    
+    // Find or create manuals section
+    let manualsSection = document.querySelector('.manuals-section');
+    if (!manualsSection) {
+        // Create new manuals section since it was removed
+        manualsSection = document.createElement('div');
+        manualsSection.className = 'manuals-section';
+        manualsSection.id = 'manuals-section';
+        
+        // Add it after activity section
+        if (activitySection && activitySection.nextSibling) {
+            mainContent.insertBefore(manualsSection, activitySection.nextSibling);
+        } else {
+            mainContent.appendChild(manualsSection);
+        }
+    }
+    
+    // Show and update manuals section
+    manualsSection.style.display = 'block';
+    manualsSection.style.visibility = 'visible';
+    manualsSection.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
+    
+    manualsSection.innerHTML = `
+            <div class="section-header">
+                <h2 class="section-title">House Manuals</h2>
+                <div class="section-filters">
+                    <button class="filter-btn active">All</button>
+                    <button class="filter-btn">Active</button>
+                    <button class="filter-btn">Draft</button>
+                </div>
+            </div>
+            
+            <div class="manuals-grid">
+                <div class="manual-card">
+                    <div class="manual-icon">
+                        <svg viewBox="0 0 24 24" width="40" height="40">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#321662" opacity="0.7"/>
+                        </svg>
+                    </div>
+                    <div class="manual-content">
+                        <h3 class="manual-title">Guest House Manual</h3>
+                        <p class="manual-desc">Complete guide with check-in instructions and house rules</p>
+                        <div class="manual-meta">
+                            <span class="meta-item">
+                                <svg viewBox="0 0 24 24" width="14" height="14">
+                                    <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" fill="currentColor"/>
+                                </svg>
+                                12 sections
+                            </span>
+                            <span class="meta-item" style="color: #10b981;">
+                                <svg viewBox="0 0 24 24" width="14" height="14">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                                </svg>
+                                New
+                            </span>
+                            <span class="meta-item">
+                                <svg viewBox="0 0 24 24" width="14" height="14">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                                </svg>
+                                0 views
+                            </span>
+                        </div>
+                    </div>
+                    <div class="manual-actions">
+                        <button class="manual-action">
+                            <svg viewBox="0 0 24 24" width="16" height="16">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                            </svg>
+                            Edit
+                        </button>
+                        <button class="manual-action">
+                            <svg viewBox="0 0 24 24" width="16" height="16">
+                                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="currentColor"/>
+                            </svg>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    
+    // Reinitialize manual cards functionality
+    setTimeout(() => {
+        document.querySelectorAll('.manual-card').forEach(card => {
+            // Remove any existing listeners first
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+            
+            // Add click handler
+            newCard.addEventListener('click', function(e) {
+                if (!e.target.closest('.manual-action')) {
+                    window.open('https://splitleasesharath.github.io/guest-house-manual/', '_blank');
+                }
+            });
+        });
+        
+        // Also reinitialize action buttons
+        document.querySelectorAll('.manual-action').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const actionText = btn.textContent.trim();
+                if (actionText === 'Share') {
+                    openShareModal();
+                } else if (actionText === 'Edit') {
+                    console.log('Edit manual clicked');
+                    // Could open edit modal or redirect to edit page
+                }
+            });
+        });
+    }, 100);
+    
+    // Store that manual was created
+    window.hmLeadManualCreated = true;
+    localStorage.setItem('hmLeadManualCreated', 'true');
+}
+
+// Helper function to create manuals section if it doesn't exist
+function createManualsSection() {
+    const section = document.createElement('div');
+    section.className = 'manuals-section';
+    section.id = 'manuals-section';
+    return section;
+}
+
+// Add new manual for HM lead after creation
+function addNewManualForHMLead() {
+    const manualsSection = document.querySelector('.manuals-section');
+    if (!manualsSection) return;
+    
+    // Update the manuals grid with a single new manual
+    manualsSection.innerHTML = `
+        <div class="section-header">
+            <h2 class="section-title">House Manuals</h2>
+            <div class="section-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Active</button>
+                <button class="filter-btn">Draft</button>
+            </div>
+        </div>
+        
+        <div class="manuals-grid">
+            <div class="manual-card">
+                <div class="manual-icon">
+                    <svg viewBox="0 0 24 24" width="40" height="40">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#321662" opacity="0.7"/>
+                    </svg>
+                </div>
+                <div class="manual-content">
+                    <h3 class="manual-title">Guest House Manual</h3>
+                    <p class="manual-desc">Complete guide with check-in instructions and house rules</p>
+                    <div class="manual-meta">
+                        <span class="meta-item">
+                            <svg viewBox="0 0 24 24" width="14" height="14">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" fill="currentColor"/>
+                            </svg>
+                            12 sections
+                        </span>
+                        <span class="meta-item">
+                            <svg viewBox="0 0 24 24" width="14" height="14">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                            </svg>
+                            New
+                        </span>
+                        <span class="meta-item">
+                            <svg viewBox="0 0 24 24" width="14" height="14">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                            </svg>
+                            0 views
+                        </span>
+                    </div>
+                </div>
+                <div class="manual-actions">
+                    <button class="manual-btn">Edit</button>
+                    <button class="manual-btn secondary">Preview</button>
+                    <button class="manual-btn primary">Share</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Store that manual was created
+    window.hmLeadManualCreated = true;
+    localStorage.setItem('hmLeadManualCreated', 'true');
+}
+
+// Load empty manuals state for HM leads
+function loadEmptyManualsState() {
+    const manualsSection = document.querySelector('.manuals-section');
+    if (!manualsSection) return;
+    
+    // Check if manual was already created
+    if (window.hmLeadManualCreated || localStorage.getItem('hmLeadManualCreated') === 'true') {
+        addNewManualForHMLead();
+        return;
+    }
+    
+    manualsSection.innerHTML = `
+        <div class="section-header">
+            <h2 class="section-title">House Manuals</h2>
+            <div class="section-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Active</button>
+                <button class="filter-btn">Draft</button>
+            </div>
+        </div>
+        
+        <div class="manuals-grid">
+            <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;">
+                <svg viewBox="0 0 24 24" width="100" height="100" style="fill: #e0e0e0; margin-bottom: 20px;">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+                <h3 style="color: #6b7280; font-weight: 400; margin-bottom: 10px; font-size: 24px;">No House Manuals Yet</h3>
+                <p style="color: #9ca3af; margin-bottom: 25px;">Create your first house manual to share with guests</p>
+                <button class="action-btn creation" onclick="document.getElementById('creation-modal').classList.add('show');" style="display: inline-block; padding: 12px 30px;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" style="margin-right: 8px;">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                    </svg>
+                    Create House Manual
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 // Load full manuals content
@@ -2119,10 +2882,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showCardLoading(show) {
-        const createCard = document.querySelector('.action-card:first-child');
+        const createCard = document.querySelector('.action-card:first-child') || document.querySelector('.action-card');
+        if (!createCard) return; // Exit if no card found
+        
         const button = createCard.querySelector('.action-btn.creation');
         const titleElement = createCard.querySelector('.action-title');
         const descElement = createCard.querySelector('.action-desc');
+        
+        if (!button) return; // Exit if no button found
         
         if (show) {
             // Change button to loading state
@@ -2227,22 +2994,61 @@ document.addEventListener('DOMContentLoaded', function() {
             showCardLoading(true);
             updateLoadingProgress();
             
-            // Complete after 60 seconds
+            // Add countdown timer for user feedback
+            let secondsRemaining = 60;
+            const countdownInterval = setInterval(() => {
+                secondsRemaining--;
+                const loadingText = document.querySelector('.loading-text');
+                if (loadingText) {
+                    loadingText.textContent = `Creating your manual... (${secondsRemaining}s remaining)`;
+                }
+                if (secondsRemaining <= 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+            
+            // Complete after 60 seconds (or click Skip button)
             generationTimer = setTimeout(() => {
                 isGenerating = false;
                 currentStep = 4;
                 showStep(4);
                 showCardLoading(false);
+                clearInterval(countdownInterval);
             }, 60000);
+        } else if (currentStep === 3) {
+            // Allow skipping from step 3 to step 4
+            if (generationTimer) {
+                clearTimeout(generationTimer);
+            }
+            isGenerating = false;
+            currentStep = 4;
+            showStep(4);
+            showCardLoading(false);
+        } else if (currentStep < 4) {
+            currentStep++;
+            showStep(currentStep);
         }
     };
 
     // Preview manual function
     window.previewManual = function() {
+        // Check if HM lead
+        const urlParams = new URLSearchParams(window.location.search);
+        const isHMLead = urlParams.get('hm_lead') === 'true';
+        
+        if (isHMLead) {
+            // Close the modal
+            modal.classList.remove('show');
+            
+            // Return to main dashboard with new manual
+            returnToDashboardWithNewManual();
+        }
+        
         window.open('https://splitleasesharath.github.io/guest-house-manual/', '_blank');
     };
 
     window.closeModal = closeModal;
+    window.showStep = showStep;
 
     // AI tool buttons (mock functionality)
     document.querySelectorAll('.ai-tool-btn').forEach(btn => {
@@ -2257,5 +3063,172 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         });
     });
+    
+    // Initialize share modal functionality
+    initializeShareModal();
+});
+
+// Share Modal Functions
+function openShareModal() {
+    const modal = document.getElementById('share-modal');
+    if (modal) {
+        modal.classList.add('show');
+        document.getElementById('share-form').style.display = 'flex';
+        document.getElementById('share-success').style.display = 'none';
+    }
+}
+
+function closeShareModal() {
+    const modal = document.getElementById('share-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        // Reset form
+        document.getElementById('share-form').reset();
+        document.getElementById('guest-email').style.display = 'block';
+        document.getElementById('guest-email').required = true;
+        document.getElementById('guest-phone').style.display = 'none';
+        document.getElementById('guest-phone').required = false;
+    }
+}
+
+function initializeShareModal() {
+    // Handle contact method toggle
+    const contactRadios = document.querySelectorAll('input[name="contact-method"]');
+    const emailInput = document.getElementById('guest-email');
+    const phoneInput = document.getElementById('guest-phone');
+    
+    contactRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'email') {
+                emailInput.style.display = 'block';
+                emailInput.required = true;
+                phoneInput.style.display = 'none';
+                phoneInput.required = false;
+            } else {
+                emailInput.style.display = 'none';
+                emailInput.required = false;
+                phoneInput.style.display = 'block';
+                phoneInput.required = true;
+            }
+        });
+    });
+    
+    // Handle form submission
+    const shareForm = document.getElementById('share-form');
+    if (shareForm) {
+        shareForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const guestName = document.getElementById('guest-name').value;
+            const contactMethod = document.querySelector('input[name="contact-method"]:checked').value;
+            const contact = contactMethod === 'email' 
+                ? document.getElementById('guest-email').value 
+                : document.getElementById('guest-phone').value;
+            const checkinDate = document.getElementById('checkin-date').value;
+            const message = document.getElementById('personal-message').value;
+            
+            // Create guest object
+            const guest = {
+                name: guestName,
+                contactMethod: contactMethod,
+                contact: contact,
+                checkinDate: checkinDate,
+                message: message,
+                sharedAt: new Date().toISOString(),
+                manualViewed: false
+            };
+            
+            // Add to shared guests list
+            window.sharedGuests.push(guest);
+            localStorage.setItem('sharedGuests', JSON.stringify(window.sharedGuests));
+            
+            // Show success message
+            document.getElementById('share-form').style.display = 'none';
+            document.getElementById('share-success').style.display = 'block';
+            document.getElementById('shared-to').textContent = guestName;
+            
+            // Update guests section if visible
+            updateGuestsSection();
+            
+            // Close modal after 2 seconds
+            setTimeout(() => {
+                closeShareModal();
+            }, 2000);
+        });
+    }
+    
+    // Handle modal close button
+    const closeBtn = document.querySelector('#share-modal .modal-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeShareModal);
+    }
+    
+    // Close modal when clicking outside
+    const shareModal = document.getElementById('share-modal');
+    if (shareModal) {
+        shareModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeShareModal();
+            }
+        });
+    }
+}
+
+// Update guests section with shared manuals
+function updateGuestsSection() {
+    const guestsGrid = document.querySelector('.guests-grid');
+    if (!guestsGrid) return;
+    
+    // Add shared guests to the grid
+    const sharedGuestsHTML = window.sharedGuests.map(guest => `
+        <div class="guest-card">
+            <div class="guest-status ${guest.manualViewed ? 'active' : 'pending'}">
+                ${guest.manualViewed ? 'Manual Viewed' : 'Manual Sent'}
+            </div>
+            <div class="guest-info">
+                <h3 class="guest-name">${guest.name}</h3>
+                <div class="guest-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Contact:</span>
+                        <span class="detail-value">${guest.contact}</span>
+                    </div>
+                    ${guest.checkinDate ? `
+                    <div class="detail-item">
+                        <span class="detail-label">Check-in:</span>
+                        <span class="detail-value">${new Date(guest.checkinDate).toLocaleDateString()}</span>
+                    </div>
+                    ` : ''}
+                    <div class="detail-item">
+                        <span class="detail-label">Shared:</span>
+                        <span class="detail-value">${new Date(guest.sharedAt).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="guest-actions">
+                <button class="guest-action-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+                    </svg>
+                    Resend
+                </button>
+                <button class="guest-action-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                    </svg>
+                    View Activity
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Prepend shared guests to existing content
+    const existingCards = guestsGrid.innerHTML;
+    guestsGrid.innerHTML = sharedGuestsHTML + existingCards;
+}
+
+// Initialize guests section on page load
+window.addEventListener('DOMContentLoaded', function() {
+    updateGuestsSection();
 });
 

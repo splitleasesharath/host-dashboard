@@ -578,7 +578,10 @@ Check-out:
                         </svg>
                     </div>
                     <h2>Generating Your House Manual</h2>
-                    <p class="loading-text">Creating a beautiful, easy-to-read manual...</p>
+                    <p class="loading-text">Creating a beautiful, easy-to-read manual... (60s remaining)</p>
+                    <div style="margin-top: 30px;">
+                        <button class="btn-secondary" onclick="nextStep()" style="padding: 10px 24px;">Skip (Preview Now)</button>
+                    </div>
                 </div>
             </div>
 
@@ -616,6 +619,69 @@ Check-out:
                 <div class="modal-nav">
                     <button class="btn-secondary" onclick="closeModal()">Close</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Manual Modal -->
+    <div id="share-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="modal-close" onclick="closeShareModal()">&times;</span>
+            
+            <h2 style="color: #321662; margin-bottom: 10px;">Share House Manual</h2>
+            <p style="color: #6b7280; margin-bottom: 30px;">Enter guest details to share your house manual</p>
+            
+            <form id="share-form" style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="form-group">
+                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Guest Name *</label>
+                    <input type="text" id="guest-name" placeholder="John Smith" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Contact Method *</label>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="contact-method" value="email" checked style="margin-right: 8px;">
+                            <span>Email</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="contact-method" value="phone" style="margin-right: 8px;">
+                            <span>Phone (SMS)</span>
+                        </label>
+                    </div>
+                    
+                    <input type="email" id="guest-email" placeholder="guest@email.com" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+                    <input type="tel" id="guest-phone" placeholder="+1 (555) 123-4567" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px; display: none;">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Check-in Date (Optional)</label>
+                    <input type="date" id="checkin-date" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; color: #4b5563; font-size: 14px; margin-bottom: 5px;">Personal Message (Optional)</label>
+                    <textarea id="personal-message" placeholder="Welcome to our home! Looking forward to hosting you..." style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px; min-height: 80px; resize: vertical;"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                    <button type="button" class="btn-secondary" onclick="closeShareModal()" style="padding: 10px 24px;">Cancel</button>
+                    <button type="submit" class="action-btn" style="padding: 10px 24px; background: #321662;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 8px;">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+                        </svg>
+                        Send Manual
+                    </button>
+                </div>
+            </form>
+            
+            <div id="share-success" style="display: none; text-align: center; padding: 40px;">
+                <svg viewBox="0 0 24 24" width="64" height="64" style="fill: #10b981; margin-bottom: 20px;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <h3 style="color: #321662; margin-bottom: 10px;">Manual Shared Successfully!</h3>
+                <p style="color: #6b7280; margin-bottom: 20px;">The house manual has been sent to <span id="shared-to"></span></p>
+                <button class="action-btn" onclick="closeShareModal()" style="padding: 10px 24px;">Done</button>
             </div>
         </div>
     </div>
